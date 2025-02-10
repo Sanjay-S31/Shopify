@@ -1,0 +1,59 @@
+/* Header styles */
+.navbar-header {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+}
+
+/* Navbar container styles */
+.navbar {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar a {
+    text-decoration: none;
+    color: white;
+}
+
+/* Navigation links styles */
+nav {
+    display: flex;
+    align-items: center;
+}
+
+/* User greeting styles */
+.navbar span {
+    margin-right: 15px;
+}
+
+
+/* Logout button styles */
+.navbar button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1em;
+    margin-left: 10px;
+    border: 2px solid white;
+}
+
+/* Login and Signup links styles */
+.navbar div a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+.cart-icon{
+    font-size: 23px;
+    position: relative;
+    top: 8px;
+}

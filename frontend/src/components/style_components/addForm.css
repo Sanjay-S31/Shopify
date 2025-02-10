@@ -1,0 +1,74 @@
+/* product add form component */
+
+.product-add-form{
+    margin: 10px 40px 0 0 ;
+    max-width: 500px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    height: fit-content;
+}
+
+.product-add-form h2 {
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.product-add-form label {
+    font-weight: bold;
+}
+
+.product-add-form input[type="text"],
+.product-add-form input[type="number"],
+.product-add-form input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.product-add-form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 100px; /* Set a minimum height */
+}
+
+.product-add-form .error {
+    color: red;
+    margin: 10px 0;
+}
+
+.product-add-form img {
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: block;
+    margin: 0 auto;
+}
+
+.product-add-form button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: auto;
+}
+
+.product-add-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+
+
