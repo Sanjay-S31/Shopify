@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useLogin } from '../hooks/useLogin'
 
-import login_img from '../assets/login-bg.jpg';
 import ecommerce_login from '../assets/ecommerce-login.jpg'
 import './style_pages/login.css'
 
