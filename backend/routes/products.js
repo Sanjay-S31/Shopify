@@ -8,7 +8,8 @@ const {
     createProduct,
     updateProduct,
     deleteProduct,
-    searchProduct
+    searchProduct,
+    getProductsByCategory
 } = require('../controllers/productController')
 
 const requireAuth = require('../middleware/requireAuth')
@@ -35,5 +36,8 @@ route.put('/:id' , updateProduct)
 
 //search a product
 route.post('/search',searchProduct)
+
+// filter a products by category
+route.post('/category', getProductsByCategory);
 
 module.exports = route

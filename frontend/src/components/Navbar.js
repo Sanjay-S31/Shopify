@@ -27,7 +27,7 @@ export default function Navbar() {
               </span>
               {user.userType === "artisan" && <Link to="/upload">Upload</Link>}
               <Link to="/">Home</Link>
-              <Link to="/product">Catalog</Link>
+              <Link to="/product">Products</Link>
               <Link to="/cart">
                 <FaShoppingCart className="cart-icon" />
               </Link>

@@ -128,6 +128,24 @@ const searchProduct = async (req,res) => {
     }
 }
 
+// filtering the product based on category
+const getProductsByCategory = async (req, res) => {
+    try {
+        const { category } = req.body;
+        
+        if (!category) {
+            return res.status(400).json({ error: "Category is required" });
+        }
+
+        const products = await Product.find({ productType: category }).sort({ createdAt: -1 });
+        res.status(200).json(products);
+    } 
+    catch (error) {
+        console.error("Error fetching products by category:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 module.exports = {
     getProducts,
     getAllProducts,
@@ -135,5 +153,6 @@ module.exports = {
     createProduct,
     deleteProduct,
     updateProduct,
-    searchProduct
+    searchProduct,
+    getProductsByCategory
 }
