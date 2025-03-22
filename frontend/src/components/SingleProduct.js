@@ -20,10 +20,20 @@ export default function SingleProduct() {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
-
+    
             if (response.ok) {
                 const result = await response.json();
                 setProduct(result);
+    
+                // After fetching product details, add product ID to product_ids set
+                await fetch('/api/user/addProductId', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify({ productId: id })
+                });
             } else {
                 console.log("Error fetching product information");
             }
@@ -31,6 +41,7 @@ export default function SingleProduct() {
             console.error("Fetch product error:", error);
         }
     }, [user.token]);
+    
 
     useEffect(() => {
         if (id && user) {

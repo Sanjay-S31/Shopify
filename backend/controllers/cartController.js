@@ -1,52 +1,80 @@
+const User = require('../models/userModel')
 const Product = require('../models/productModel')
 
-const displayCartItems = async (req,res) => {
-    //const user_id = req.user._id
+// Display cart items for the current user
+const displayCartItems = async (req, res) => {
+    const userId = req.user._id
 
-    const products = await Product.find({ inCart: true }).sort({createdAt:-1})
+    try {
+        const user = await User.findById(userId)
 
-    res.status(200).json(products)
+        // Find all products in user's cart_items array
+        const products = await Product.find({ _id: { $in: user.cart_items } })
+
+        res.status(200).json(products)
+    } catch (error) {
+        console.error("Error fetching cart:", error)
+        res.status(500).json({ error: "Failed to fetch cart items" })
+    }
 }
 
-const addCartItem = async (req,res) => {
+// Add a product to cart
+const addCartItem = async (req, res) => {
+    const userId = req.user._id
     const { id } = req.params
-    const product = await Product.findByIdAndUpdate({_id: id}, {inCart : true}, {new : true})
 
-    if(product){
-        res.status(200).json(product)
-    }
-    else{
-        console.log("Error occured")
-        res.status(400).json({error : "Couldn't find the product"})
-    }
+    try {
+        const product = await Product.findById(id)
+        if (!product) {
+            return res.status(404).json({ error: "Product not found" })
+        }
 
-}
+        const user = await User.findById(userId)
 
-const removeCartItem = async (req,res) => {
+        // Add product ID to cart_items only if it's not already there
+        if (!user.cart_items.includes(id)) {
+            user.cart_items.push(id)
+            await user.save()
+        }
 
-    const {id} = req.params
-    const product = await Product.findByIdAndUpdate({_id: id}, {inCart : false},{new : true})
-
-    if(product){
-        res.status(200).json(product)
-    }
-    else{
-        res.status(400).json({error : "Couldn't find the product"})
+        res.status(200).json({ cart_items: user.cart_items })
+    } catch (error) {
+        console.error("Error adding to cart:", error)
+        res.status(500).json({ error: "Failed to add item to cart" })
     }
 }
 
-const removeAllItems = async (req,res) => {
+// Remove a product from cart
+const removeCartItem = async (req, res) => {
+    const userId = req.user._id
+    const { id } = req.params
 
-    try{
-        await Product.updateMany({}, {inCart : false})
-        res.status(200).json({msg : "ok"})
-    }
-    catch(error){
-        console.log(error)
-        res.status(500).json({error : "Error occured"})
+    try {
+        const user = await User.findById(userId)
+
+        // Remove the product ID from cart_items array
+        user.cart_items = user.cart_items.filter(itemId => itemId !== id)
+        await user.save()
+
+        res.status(200).json({ cart_items: user.cart_items })
+    } catch (error) {
+        console.error("Error removing from cart:", error)
+        res.status(500).json({ error: "Failed to remove item from cart" })
     }
 }
 
+// Remove all items from cart (e.g., after checkout)
+const removeAllItems = async (req, res) => {
+    const userId = req.user._id
+
+    try {
+        await User.findByIdAndUpdate(userId, { cart_items: [] })
+        res.status(200).json({ msg: "Cart cleared" })
+    } catch (error) {
+        console.error("Error clearing cart:", error)
+        res.status(500).json({ error: "Failed to clear cart" })
+    }
+}
 
 module.exports = {
     displayCartItems,

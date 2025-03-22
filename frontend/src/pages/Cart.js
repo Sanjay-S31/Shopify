@@ -40,8 +40,6 @@ export default function Cart() {
         displayAll()
     }, [user.token , total])
 
-    //console.log(cartProduct)
-
     const calculateTotal = (products) => {
         const totalCost = products.reduce((acc, product) => acc + product.cost, 0);
         setTotal(totalCost);

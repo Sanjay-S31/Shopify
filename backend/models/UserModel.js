@@ -19,6 +19,14 @@ const userSchema = new Schema({
     userType : {
         type : String,
         required : true
+    },
+    product_ids: {
+        type: [String],
+        default: []
+    },
+    cart_items: {
+        type: [String],
+        default: []
     }
 } , {timestamps : true})
 

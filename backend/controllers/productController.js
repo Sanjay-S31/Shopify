@@ -27,7 +27,7 @@ const getProductWithId = async (req,res) => {
 
     const product = await Product.findById({_id : id})
     if(!product){
-        return res.status(400).json({error : "Deletion of product failed"})
+        return res.status(400).json({error : "Cannot find the product with this id"})
     }
     res.status(200).json(product)
     

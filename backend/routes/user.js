@@ -1,15 +1,22 @@
-const express = require('express')
-const route = express.Router()
+const express = require("express");
+const route = express.Router();
+
+const requireAuth = require('../middleware/requireAuth')
 
 const {
-    loginUser,
-    signupUser
-} = require('../controllers/userController')
+  loginUser,
+  signupUser,
+  addProductId,
+} = require("../controllers/userController");
 
 //login
-route.post('/login' , loginUser)
+route.post("/login", loginUser);
 
-//signup 
-route.post('/signup' , signupUser)
+//signup
+route.post("/signup", signupUser);
 
-module.exports = route
+route.use(requireAuth);
+
+route.put("/addProductId", addProductId);
+
+module.exports = route;
