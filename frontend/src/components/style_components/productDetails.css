@@ -1,69 +1,162 @@
-/* productDetails.css */
-
-.product-details {
-    margin: 20px auto;
-    max-width: 600px;
+.artisan-homepage {
+    width: 100%;
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+}
+
+.artisan-homepage h2 {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+/* Create the 3:1 ratio layout */
+.artisan-page {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+}
+
+/* Products section takes 75% of the width (3/4) */
+.products-container {
+    width: 75%;
+}
+
+/* Product form takes 25% of the width (1/4) */
+.form-container {
+    width: 25%;
+}
+
+/* Grid container for products - 3 columns */
+.products {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+/* Product card */
+.product-details {
+    width: 100%;
+    height: 470px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
+.product-details:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.02);
+}
+
+/* Center the product name */
 .product-details h4 {
-    margin-bottom: 10px;
-    font-size: 1.2em;
-}
-
-.product-details p {
-    margin-bottom: 5px;
-}
-
-.product-details img {
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.product-details .btn-modal {
+    font-size: 1.1em;
+    margin-bottom: 12px;
+    text-align: center;
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-
 }
 
-.product-details .btn-modal .product-delete-button{
-    padding: 8px 16px;
+/* Left align the product details */
+.product-details p {
+    margin: 4px 0;
+    font-size: 0.9em;
+    text-align: left;
+    align-self: flex-start;
+    width: 100%;
+}
+
+/* Center the date text specifically */
+.product-details p.date-text {
+    text-align: center;
+}
+
+/* Description section inside product-details */
+.product-description-container {
+    width: 100%;
+    text-align: left;
+    margin: 6px 0;
+    overflow: hidden;
+    align-self: flex-start;
+}
+
+.product-description-container p {
+    margin-bottom: 2px;
+}
+
+.truncated-description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    display: inline-block;
+}
+
+/* See more/less button */
+.toggle-description-btn {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-top: 4px;
+    padding: 0;
+    text-align: left;
+}
+
+/* Center the image */
+.product-details img {
+    margin: 10px auto;
+    border-radius: 6px;
+    object-fit: contain;
+    height: 150px;
+    width: 150px;
+    align-self: center;
+}
+
+.btn-modal {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: auto;
+}
+
+.product-delete-button,
+.product-update-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.product-delete-button {
     background-color: red;
     color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
 }
 
-.product-details .btn-modal .product-update-button{
-    padding: 8px 16px;
+.product-update-button {
     background-color: #007bff;
     color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
 }
 
+/* Modal styling */
+
+body.active-modal {
+    overflow: hidden;
+    /* Prevents scrolling when modal is open */
+}
 
 .modal {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
@@ -77,78 +170,112 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: transparent;
 }
 
 .modal-content {
     position: relative;
     background-color: #fff;
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    min-width: 40%;
-    overflow: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    z-index: 1001;
 }
 
 .modal-content h2 {
-    margin-bottom: 20px;
     text-align: center;
+    margin-bottom: 20px;
+}
+
+.modal-content form .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .modal-content form label {
     font-weight: bold;
-    display: inline-block;
-    width: 25%; 
-    margin-left: 10px;
-}
-
-.modal-content form .desc{
-    vertical-align: top;
+    width: 30%;
+    margin-right: 10px;
+    margin-top: 0;
 }
 
 .modal-content form input,
 .modal-content form textarea {
-    width: 65%; 
+    width: 70%;
     padding: 8px;
-    margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box;
-    display: inline-block; 
+    margin-top: 0;
 }
 
 .modal-content form textarea {
-    resize: vertical; 
+    resize: vertical;
     min-height: 70px;
 }
 
 .modal-content form button {
-    padding: 8px 16px;
+    margin-top: 15px;
     background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 4px;
+    padding: 10px 16px;
+    border-radius: 5px;
     cursor: pointer;
-    margin-top: 10px;
+    width: 100%;
 }
 
-.modal-content form img {
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    display: block;
-    margin: 0 auto; /* Center align the image */
-}
-
-/* Close button */
 .close-modal {
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: transparent;
+    background-color: #dc3545;
+    color: white;
     border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 16px;
-    color: #333;
-  }
-  
+}
+
+.modal-content form img {
+    display: block;
+    max-width: 70%;
+    height: auto;
+    margin: 10px auto;
+    border-radius: 4px;
+    max-height: 150px;
+    /* Reduced image size */
+    object-fit: contain;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 1200px) {
+    .products {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .artisan-page {
+        flex-direction: column;
+    }
+
+    .products-container,
+    .form-container {
+        width: 100%;
+    }
+
+    .product-add-form {
+        margin-top: 30px;
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .products {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,13 +1,11 @@
-/* product add form component */
-
-.product-add-form{
-    margin: 10px 40px 0 0 ;
-    max-width: 500px;
+.product-add-form {
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #f9f9f9;
     height: fit-content;
+    position: sticky;
+    top: 20px;
 }
 
 .product-add-form h2 {
@@ -53,6 +51,8 @@
     border-radius: 4px;
     display: block;
     margin: 0 auto;
+    max-width: 100%;
+    height: auto;
 }
 
 .product-add-form button {
@@ -62,13 +62,11 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 .product-add-form button:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
-
-
-

@@ -78,21 +78,41 @@
     margin-bottom: 20px;
 }
 
-.product-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+/* Liked Products Section */
+.liked-products {
+    width: 90%;
+    text-align: center;
+    margin-top: 50px;
 }
 
+.liked-products h2 {
+    font-size: 28px;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+.liked-products p {
+    color: #666;
+    font-size: 18px;
+}
+
+/* Grid Layout for Product Cards */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    justify-items: center;
+    width: 100%;
+}
+
+/* Product Card Styling */
 .product-card {
-    width: 200px;
-    height: 250px;
     background: white;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
+    cursor: pointer;
 }
 
 .product-card img {
@@ -103,4 +123,5 @@
 
 .product-card:hover {
     transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }

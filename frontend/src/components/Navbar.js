@@ -22,10 +22,10 @@ export default function Navbar() {
         <nav>
           {user && (
             <div>
-              <span>
-                <FaUser /> {user.username}
-              </span>
-              {user.userType === "artisan" && <Link to="/upload">Upload</Link>}
+              <Link to="/profile">
+                <FaUser />  {user.username}
+              </Link>
+              {user.userType === "admin" && <Link to="/upload">Upload</Link>}
               <Link to="/">Home</Link>
               <Link to="/product">Products</Link>
               <Link to="/cart">

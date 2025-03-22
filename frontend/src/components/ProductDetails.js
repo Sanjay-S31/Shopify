@@ -1,76 +1,75 @@
-import formatDistanceToNow from 'date-fns/formatDistanceToNow'
-import { useState } from 'react'
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { useState, useEffect } from 'react';
 
-import { useProductsContext } from '../hooks/useProductsContext'
-import { useAuthContext } from '../hooks/useAuthContext'
-import './style_components/productDetails.css'
-
+import { useProductsContext } from '../hooks/useProductsContext';
+import { useAuthContext } from '../hooks/useAuthContext';
+import './style_components/productDetails.css';
 
 const ProductDetails = ({ product }) => {
-    const [productName , setProductName] = useState(product.productName)
-    const [productType , setProductType] = useState(product.productType)
-    const [description , setDescription] = useState(product.description)
-    const [cost , setCost] = useState(product.cost)
-    const [quantity , setQuantity] = useState(product.quantity)
-    const [tags , setTags] = useState(product.tags)
-    const [productImage, setProductImage] = useState(product.productImage)
+    const [productName, setProductName] = useState(product.productName);
+    const [productType, setProductType] = useState(product.productType);
+    const [description, setDescription] = useState(product.description);
+    const [cost, setCost] = useState(product.cost);
+    const [quantity, setQuantity] = useState(product.quantity);
+    const [tags, setTags] = useState(product.tags);
+    const [productImage, setProductImage] = useState(product.productImage);
 
     const [modal, setModal] = useState(false);
+    const [showFullDesc, setShowFullDesc] = useState(false);
 
-    const {dispatch} = useProductsContext()
-    const {user} = useAuthContext()
+    const { dispatch } = useProductsContext();
+    const { user } = useAuthContext();
 
-    const toggleModal = () => {
-        setModal(!modal);
-    }
+    const toggleModal = () => setModal(!modal);
+    const toggleDescription = () => setShowFullDesc(!showFullDesc);
 
-    if(modal) {
-        document.body.classList.add('active-modal')
-    } else {
-        document.body.classList.remove('active-modal')
-    }
+    // Effect to manage body class for modal
+    useEffect(() => {
+        if (modal) {
+            document.body.classList.add('active-modal');
+        } else {
+            document.body.classList.remove('active-modal');
+        }
+        
+        // Cleanup function to ensure we remove the class when component unmounts
+        return () => {
+            document.body.classList.remove('active-modal');
+        };
+    }, [modal]);
 
     const imageToBase64 = (file) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-
-        const data = new Promise((resolve,reject) => {
-            reader.onload = () => resolve(reader.result)
-            reader.onerror = (error) => reject(error) 
-        })
-        return data
-    }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        return new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+        });
+    };
 
     const handleUploadImage = async (event) => {
-        const file = event.target.files[0]
-        const image = await imageToBase64(file)
-        setProductImage(image)
-    }
+        const file = event.target.files[0];
+        const image = await imageToBase64(file);
+        setProductImage(image);
+    };
 
     const handleDelete = async () => {
+        if (!user) return;
 
-        if(!user){
-            return
+        const response = await fetch('api/products/' + product._id, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${user.token}` }
+        });
+
+        const jsonData = await response.json();
+
+        if (response.ok) {
+            dispatch({ type: 'DELETE_PRODUCT', payload: jsonData });
         }
+    };
 
-        const response = await fetch('api/products/'+product._id , {
-            method : 'delete',
-            headers : {
-                'Authorization' : `Bearer ${user.token}`
-            }
-        })
-
-        const jsonData = await response.json()
-
-        if(response.ok){
-            dispatch({type: 'DELETE_PRODUCT', payload: jsonData})
-        }
-    }
-
-    const handleUpdate = async () => {
-        if(!user){
-            return
-        }
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        if (!user) return;
 
         const updatedProduct = {
             productName,
@@ -80,109 +79,133 @@ const ProductDetails = ({ product }) => {
             quantity,
             tags,
             productImage
-        }
+        };
 
-        console.log(updatedProduct)
-
-        const response = await fetch('api/products/'+product._id , {
-            method : 'put',
-            headers : {
-                'Content-Type' : 'application/json',
-                'Authorization' : `Bearer ${user.token}`
+        const response = await fetch('api/products/' + product._id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.token}`
             },
             body: JSON.stringify(updatedProduct)
-        })
+        });
 
-        const jsonData = await response.json()
-        console.log(jsonData)
+        const jsonData = await response.json();
 
-        if(response.ok){
-            dispatch({type: 'UPDATE_PRODUCT', payload: jsonData})
+        if (response.ok) {
+            dispatch({ type: 'UPDATE_PRODUCT', payload: jsonData });
+            toggleModal();
         }
-    }   
-
+    };
 
     return (
-        <div className='product-details'>
-            <h4>{product.productName}</h4>
-            <p><strong>Type : </strong>{product.productType}</p>
-            <p><strong>Description : </strong>{product.description}</p>
-            <p><strong>Cost : </strong>{product.cost}</p>
-            <p><strong>Quantity : </strong>{product.quantity}</p>
-            <p><strong>Tags : </strong>{product.tags}</p>
-            <img src={product.productImage} alt={product.productName} height={200} width={200}/>
-            <p>{formatDistanceToNow(new Date(product.createdAt), { addSuffix: true })}</p>
-            <div className="btn-modal">
-                <button className="product-delete-button" onClick={handleDelete}>Delete</button>
-                <button className="product-update-button" onClick={toggleModal} >Update</button>
+        <>
+            <div className='product-details'>
+                <h4>{product.productName}</h4>
+                <p><strong>Type:</strong> {product.productType}</p>
+
+                <div className='product-description-container'>
+                    <p><strong>Description:</strong></p>
+                    <span className={showFullDesc ? '' : 'truncated-description'}>
+                        {description}
+                    </span>
+                    {description.length > 30 && (
+                        <button className='toggle-description-btn' onClick={toggleDescription}>
+                            {showFullDesc ? 'See less' : 'See more'}
+                        </button>
+                    )}
+                </div>
+
+                <p><strong>Cost:</strong> ₹{product.cost}</p>
+                <p><strong>Quantity:</strong> {product.quantity}</p>
+                <p><strong>Tags:</strong> {product.tags}</p>
+                <img src={product.productImage} alt={product.productName} />
+                <p className="date-text">{formatDistanceToNow(new Date(product.createdAt), { addSuffix: true })}</p>
+
+                <div className="btn-modal">
+                    <button className="product-delete-button" onClick={handleDelete}>Delete</button>
+                    <button className="product-update-button" onClick={toggleModal}>Update</button>
+                </div>
             </div>
-            {
-                modal && (
-                    <div className='modal'>
-                        <div onClick={toggleModal} className='overlay'></div>
-                        <div className='modal-content'>
-                            <h2>Update Product</h2>
-                            <form onSubmit={handleUpdate} >
-                                <label>Product Name : </label>
+
+            {/* Modal with updated form structure */}
+            {modal && (
+                <div className='modal'>
+                    <div onClick={toggleModal} className='overlay'></div>
+                    <div className='modal-content'>
+                        <h2>Update Product</h2>
+                        <form onSubmit={handleUpdate}>
+                            <div className="form-group">
+                                <label>Product Name:</label>
                                 <input
                                     type="text"
                                     value={productName}
-                                    onChange={(event) => setProductName(event.target.value)}
+                                    onChange={(e) => setProductName(e.target.value)}
                                 />
-                                <br/>
-                                <label>Product Type : </label>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Product Type:</label>
                                 <input
                                     type="text"
                                     value={productType}
-                                    onChange={(event) => setProductType(event.target.value)}
+                                    onChange={(e) => setProductType(e.target.value)}
                                 />
-                                <br/>
-                                <label className="desc">Description : </label>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Description:</label>
                                 <textarea
-                                    type="text"
                                     value={description}
-                                    onChange={(event) => setDescription(event.target.value)}
+                                    onChange={(e) => setDescription(e.target.value)}
                                 />
-                                <br/>
-                                <label>Cost : </label>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Cost:</label>
                                 <input
                                     type="number"
                                     value={cost}
-                                    onChange={(event) => setCost(event.target.value)}
+                                    onChange={(e) => setCost(e.target.value)}
                                 />
-                                <br/>
-                                <label>Quantity : </label>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Quantity:</label>
                                 <input
                                     type="number"
                                     value={quantity}
-                                    onChange={(event) => setQuantity(event.target.value)}
+                                    onChange={(e) => setQuantity(e.target.value)}
                                 />
-                                <br/>
-                                <label>Tags : </label>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Tags:</label>
                                 <input
                                     type="text"
                                     value={tags}
-                                    onChange={(event) => setTags(event.target.value)}
+                                    onChange={(e) => setTags(e.target.value)}
                                 />
-                                <br/>
-                                <label>Image Upload : </label>
+                            </div>
+                            
+                            <div className="form-group">
+                                <label>Image Upload:</label>
                                 <input
                                     type='file'
                                     accept='image/*'
-                                    onChange = {handleUploadImage}
+                                    onChange={handleUploadImage}
                                 />
-                                <br/>
-                                {productImage && <img src={productImage} alt='product' width={200} height={200}/>}
-                                <br/>
-                                <button>Submit</button>
-                            </form>
-                            <button onClick={toggleModal} className='close-modal'>X</button>
-                        </div>
+                            </div>
+                            
+                            {productImage && <img src={productImage} alt='product' />}
+                            <button type="submit">Submit</button>
+                        </form>
+                        <button onClick={toggleModal} className='close-modal'>X</button>
                     </div>
-                )
-            }
-        </div>
-    )
-}
+                </div>
+            )}
+        </>
+    );
+};
 
-export default ProductDetails
+export default ProductDetails;

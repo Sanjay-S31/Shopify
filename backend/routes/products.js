@@ -16,7 +16,7 @@ const requireAuth = require('../middleware/requireAuth')
 
 route.use(requireAuth)
 
-//get product details for particular artisan
+//get product details for particular user
 route.get('/' , getProducts)
 
 //get all the product

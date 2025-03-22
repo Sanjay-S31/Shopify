@@ -59,7 +59,7 @@ export default function SignUp(){
                         <div className="input-box" style={{ display: "none" }}>
                             <select className="select-user" onChange={(event) => setUserType(event.target.value)}>
                                 <option value="user">User</option>
-                                <option value="artisan">Admin</option>
+                                <option value="admin">Admin</option>
                             </select>
                         </div>
                         <button disabled={isLoading} className="btn" id="register">Register</button>

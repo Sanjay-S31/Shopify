@@ -1,16 +1,15 @@
 const AllProducts = ({ product }) => {
-
     return (
         <div className='product-card'>
-            <div>
-                {product.productImage && <img src={product.productImage} alt={product.productName} height={200} width={200}/>}
-                <h4>{product.productName}</h4>
+            <div className="product-image-wrapper">
+                {product.productImage && (
+                    <img src={product.productImage} alt={product.productName} />
+                )}
             </div>
-            <p><strong>Type : </strong>{product.productType}</p>
-            <p><strong>Cost : </strong>{product.cost}</p>
+            <h4 className="product-name">{product.productName}</h4>
+            <p className="product-cost"><strong>Cost:</strong> ₹{product.cost}</p>
         </div>
-    )
+    );
+};
 
-}
-
-export default AllProducts
+export default AllProducts;

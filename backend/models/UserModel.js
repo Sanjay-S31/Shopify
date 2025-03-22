@@ -20,11 +20,28 @@ const userSchema = new Schema({
         type : String,
         required : true
     },
+    mobile_no: {
+        type: String,
+        default: ""
+    },
+    gender: {
+        type: String,
+        enum: ['Male', 'Female',''], 
+        default: ""
+    },
+    address: {
+        type: String,
+        default: ""
+    },
     product_ids: {
         type: [String],
         default: []
     },
     cart_items: {
+        type: [String],
+        default: []
+    },
+    liked_items: {
         type: [String],
         default: []
     }
