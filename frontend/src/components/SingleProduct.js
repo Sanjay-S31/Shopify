@@ -110,32 +110,38 @@ export default function SingleProduct() {
     };
     
     const handleAddReview = async () => {
-        if (!newReview.trim()) return;
+    if (!newReview.trim()) return;
 
-        try {
-            const response = await fetch('/api/products/addReview/' + id, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user.token}`
-                },
-                body: JSON.stringify({ review: newReview })
-            });
+    try {
+        const response = await fetch('/api/products/addReview/' + id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.token}`
+            },
+            body: JSON.stringify({ review: newReview })
+        });
 
-            if (response.ok) {
-                const updatedProduct = await response.json();
-                setProduct(updatedProduct);
-                setReviews(updatedProduct.productReviews);
-                setNewReview('');
-                // Automatically show reviews after submitting
-                setShowReviews(true);
+        const result = await response.json();
+        console.log(result)
+        if (response.ok) {
+            if (result.message === "Product deleted due to excessive negative reviews.") {
+                alert("This product has been removed due to too many negative reviews.");
+                navigate("/"); // Redirect to home page or product list
             } else {
-                console.log("Failed to add review");
+                setProduct(result);
+                setReviews(result.productReviews);
+                setNewReview('');
+                setShowReviews(true);
             }
-        } catch (error) {
-            console.error("Add review error:", error);
+        } else {
+            console.log("Failed to add review");
         }
-    };
+    } catch (error) {
+        console.error("Add review error:", error);
+    }
+};
+
 
     return (
         <div className="single-product-page">
@@ -217,21 +223,22 @@ export default function SingleProduct() {
             
             {/* Reviews section moved outside the single-product-container */}
             {showReviews && (
-                <div className="reviews-container">
-                    <div className="reviews-list">
-                        <h4>Customer Reviews</h4>
-                        {reviews.length === 0 ? (
-                            <p className="no-reviews">No reviews yet. Be the first to review!</p>
-                        ) : (
-                            reviews.map((rev, index) => (
-                                <div key={index} className="review-item">
-                                    {rev}
-                                </div>
-                            ))
-                        )}
+    <div className="reviews-container">
+        <div className="reviews-list">
+            <h4>Customer Reviews</h4>
+            {reviews && reviews.length > 0 ? (
+                reviews.map((rev, index) => (
+                    <div key={index} className="review-item">
+                        {rev}
                     </div>
-                </div>
+                ))
+            ) : (
+                <p className="no-reviews">No reviews yet. Be the first to review!</p>
             )}
+        </div>
+    </div>
+)}
+
         </div>
     );
 }

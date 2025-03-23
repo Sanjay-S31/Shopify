@@ -1,6 +1,6 @@
 const Product = require('../models/productModel')
 const mongoose = require('mongoose')
-
+const axios = require("axios");
 const getProducts = async (req,res) => {
 
     const user_id = req.user._id
@@ -161,13 +161,28 @@ const addReviewToProduct = async (req, res) => {
             return res.status(404).json({ error: "Product not found" });
         }
 
+        // Send review to Flask API for sentiment analysis
+        const flaskApiUrl = "http://localhost:5000/analyze-review"; // Ensure Flask is running
+        const sentimentResponse = await axios.post(flaskApiUrl, { review });
+
+        const sentiment = sentimentResponse.data.sentiment; // "positive", "negative", or "neutral"
+
+        // Add review to product reviews array
         product.productReviews.push(review);
 
-        // Optional: Update sentiment counts (rudimentary)
-        if (review.toLowerCase().includes('good') || review.toLowerCase().includes('excellent')) {
+        // Update sentiment count based on response
+        if (sentiment === "positive") {
             product.positiveReviewCount += 1;
-        } else if (review.toLowerCase().includes('bad') || review.toLowerCase().includes('poor')) {
+        } else if (sentiment === "negative") {
             product.negativeReviewCount += 1;
+        }
+
+        // Check if negative reviews exceed threshold (3)
+        if (product.negativeReviewCount > 3) {
+            console.log("hi machi")
+            await Product.findByIdAndDelete(id);
+            console.log("hi machi")
+            return res.status(200).json({ message: "Product deleted due to excessive negative reviews." });
         }
 
         await product.save();
@@ -177,7 +192,6 @@ const addReviewToProduct = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
 
 module.exports = {
     getProducts,

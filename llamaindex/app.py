@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 from sample import get_similar_products  # Import the function
-
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 app = Flask(__name__)
-
+analyzer = SentimentIntensityAnalyzer()
 @app.route("/update-products", methods=["POST"])
 def update_products():
     try:
@@ -20,6 +20,28 @@ def update_products():
         print(result)
         
         return jsonify(result), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/analyze-review", methods=["POST"])
+def analyze_review():
+    try:
+        data = request.json
+        review = data.get("review", "")  # Extract the review from request
+
+        if not review:
+            return jsonify({"error": "Missing review text"}), 400
+
+        # Perform sentiment analysis using VADER
+        sentiment_score = analyzer.polarity_scores(review)["compound"]
+        sentiment = "neutral"
+        if sentiment_score >= 0.05:
+            sentiment = "positive"
+        elif sentiment_score <= -0.05:
+            sentiment = "negative"
+        
+        return jsonify({"review": review, "sentiment": sentiment, "sentiment_score": sentiment_score}), 200
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500

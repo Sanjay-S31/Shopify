@@ -2,7 +2,7 @@ const User = require('../models/userModel')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const validator = require('validator');
-const Recommendation = require('../models/recommendationModel')
+const Recommendation = require('../models/RecommendationModel')
 const Product = require('../models/productModel');
 
 const axios = require("axios"); // Import axios for making HTTP requests
