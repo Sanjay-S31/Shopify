@@ -11,7 +11,8 @@ const {
   getLikedProducts,
   getUserProfile,
   editUserProfile,
-  changePassword
+  changePassword,
+  getRecommendedProducts,
 } = require("../controllers/userController");
 
 //login
@@ -33,5 +34,7 @@ route.get("/getUserProfile", getUserProfile);
 route.put("/editUserProfile", editUserProfile);
 
 route.put("/changePassword", changePassword);
+
+route.get('/recommendation',getRecommendedProducts);
 
 module.exports = route;

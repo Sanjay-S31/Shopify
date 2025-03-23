@@ -17,6 +17,9 @@ export default function Home() {
   const navigate = useNavigate(); // Initialize navigate
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedProducts, setLikedProducts] = useState([]);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [hasFetchedRecommendations, setHasFetchedRecommendations] = useState(false);
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,26 +32,28 @@ export default function Home() {
     const fetchLikedProducts = async () => {
       try {
         const res = await fetch("/api/user/likedProducts", {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-          }
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
         });
 
         const data = await res.json();
         const likedProductIds = data.liked_items || [];
 
-        const productDetailsPromises = likedProductIds.map(async (productId) => {
-          const productRes = await fetch('/api/products/' + productId, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${user.token}`
-            }
-          });
-          return await productRes.json();
-        });
+        const productDetailsPromises = likedProductIds.map(
+          async (productId) => {
+            const productRes = await fetch("/api/products/" + productId, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user.token}`,
+              },
+            });
+            return await productRes.json();
+          }
+        );
 
         const likedProductDetails = await Promise.all(productDetailsPromises);
         setLikedProducts(likedProductDetails);
@@ -61,6 +66,36 @@ export default function Home() {
       fetchLikedProducts();
     }
   }, [user]);
+
+  useEffect(() => {
+    const fetchRecommendedProducts = async () => {
+      if (!user || !user.token) return; // Ensure user is logged in before fetching
+  
+      try {
+        const res = await fetch("/api/user/recommendation", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+  
+        if (!res.ok) {
+          throw new Error("Failed to fetch recommended products");
+        }
+  
+        const data = await res.json();
+        setRecommendedProducts(data.recommendedProducts || []);
+        localStorage.setItem("recommendedProducts", JSON.stringify(data.recommendedProducts || []));
+      } catch (err) {
+        console.error("Error fetching recommended products:", err);
+      }
+    };
+  
+    fetchRecommendedProducts();
+  }, [user]); // Runs every time the user state changes (including page refresh)
+  
+  
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) =>
@@ -92,7 +127,7 @@ export default function Home() {
       </div>
 
       {/* Recommended Products */}
-      <div className="recommended-products">
+      {/* <div className="recommended-products">
         <h2>Recommended Products</h2>
         <div className="product-grid">
           {images.map((image, index) => (
@@ -100,6 +135,26 @@ export default function Home() {
               <img src={image} alt={`Product ${index + 1}`} />
             </div>
           ))}
+        </div>
+      </div> */}
+
+      <div className="recommended-products">
+        <h2>Recommended Products</h2>
+        <div className="product-grid">
+          {recommendedProducts.length === 0 ? (
+            <p>No recommendations available.</p>
+          ) : (
+            recommendedProducts.map((product) => (
+              <div
+                key={product._id}
+                className="product-card"
+                onClick={() => handleProductClick(product._id)}
+              >
+                <img src={product.productImage} alt={product.productName} />
+                <p>{product.productName}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -116,10 +171,7 @@ export default function Home() {
                 className="product-card liked"
                 onClick={() => handleProductClick(product._id)}
               >
-                <img
-                  src={product.productImage}
-                  alt={product.productName}
-                />
+                <img src={product.productImage} alt={product.productName} />
               </div>
             ))}
           </div>

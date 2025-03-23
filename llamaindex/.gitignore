@@ -1,0 +1,31 @@
+# Byte-compiled / cached files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+.env/
+*.venv
+env/
+*.env
+
+# Flask instance and config files
+instance/
+config.py
+
+# Logs and database files
+*.log
+*.sqlite3
+*.db
+
+# IDE / Editor specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencies
+*.egg-info/
+pip-log.txt
