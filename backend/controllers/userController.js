@@ -2,7 +2,7 @@ const User = require('../models/userModel')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const validator = require('validator');
-const Recommendation = require('../models/RecommendationModel')
+const Recommendation = require('../models/recommendationModel')
 const Product = require('../models/productModel');
 
 const axios = require("axios"); // Import axios for making HTTP requests
@@ -80,8 +80,6 @@ const addProductId = async (req, res) => {
                 { upsert: true, new: true } // Create a new record if not exists
             );
 
-            console.log("Updated recommendations:", recommendedProducts);
-
         } catch (notificationError) {
             console.error("Error notifying related product service:", notificationError.message);
         }
@@ -91,29 +89,6 @@ const addProductId = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 }
-
-const getRecommendedProducts = async (req, res) => {
-    const userId = req.user._id;
-    
-    try {
-        // Find the recommended products for the user
-        const recommendation = await Recommendation.findOne({ userId });
-        
-        if (!recommendation || !recommendation.recommendedProductIds.length) {
-            return res.status(200).json({ recommendedProducts: [] });
-        }
-
-        // Fetch product details
-        const products = await Product.find({ _id: { $in: recommendation.recommendedProductIds } });
-        
-        res.status(200).json({ recommendedProducts: products });
-    } catch (error) {
-        console.error("Error fetching recommended products:", error);
-        res.status(500).json({ error: "Failed to fetch recommended products" });
-    }
-};
-
-
 
 // liked products by the user
 const addLikedProduct = async (req, res) => {
@@ -212,6 +187,28 @@ const changePassword = async (req, res) => {
         res.status(500).json({ error: "Failed to change password" });
     }
 };
+
+const getRecommendedProducts = async (req, res) => {
+    const userId = req.user._id;
+    
+    try {
+        // Find the recommended products for the user
+        const recommendation = await Recommendation.findOne({ userId });
+        
+        if (!recommendation || !recommendation.recommendedProductIds.length) {
+            return res.status(200).json({ recommendedProducts: [] });
+        }
+
+        // Fetch product details
+        const products = await Product.find({ _id: { $in: recommendation.recommendedProductIds } });
+        
+        res.status(200).json({ recommendedProducts: products });
+    } catch (error) {
+        console.error("Error fetching recommended products:", error);
+        res.status(500).json({ error: "Failed to fetch recommended products" });
+    }
+};
+
 
 
 module.exports = {

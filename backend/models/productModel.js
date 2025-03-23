@@ -38,6 +38,18 @@ const productSchema = new Schema({
     inCart : {
         type : Boolean,
         default : false
+    },
+    productReviews : {
+        type: [String],
+        default: []
+    },
+    positiveReviewCount : {
+        type : Number,
+        default : 0
+    },
+    negativeReviewCount : {
+        type : Number,
+        default : 0
     }
 } , {timestamps : true})
 

@@ -1,3 +1,4 @@
+/* product.css */
 .productpage {
     margin: 20px;
 }
@@ -59,7 +60,7 @@
     padding: 20px;
 }
 
-.product-card {
+.product-page-card {
     background: #ffffff;
     border-radius: 12px;
     overflow: hidden;
@@ -70,7 +71,7 @@
     height: 350px;
 }
 
-.product-card:hover {
+.product-page-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
@@ -91,7 +92,7 @@
     object-fit: contain;
 }
 
-.product-name {
+.product-page-name {
     font-size: 1.2rem;
     font-weight: 600;
     padding: 10px 15px 5px;
@@ -99,7 +100,7 @@
     text-align: center;
 }
 
-.product-cost {
+.product-page-cost {
     font-size: 1rem;
     padding: 0 15px 15px;
     color: #555;

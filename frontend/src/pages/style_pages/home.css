@@ -1,3 +1,4 @@
+/* home.css */
 .homepage {
     height: auto;
     display: flex;
@@ -7,7 +8,7 @@
     padding-bottom: 50px;
 }
 
-.carousel {
+.home-carousel {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -17,7 +18,7 @@
     margin-top: 20px;
 }
 
-.slides {
+.home-slides {
     width: 100%;
     height: 100%;
     border-radius: 10px;
@@ -25,7 +26,7 @@
     transition: transform 0.5s ease-in-out;
 }
 
-.arrow {
+.home-arrow {
     font-size: 2rem;
     cursor: pointer;
     position: absolute;
@@ -38,15 +39,15 @@
     transition: 0.3s;
 }
 
-.arrow-left {
+.home-arrow-left {
     left: 10px;
 }
 
-.arrow-right {
+.home-arrow-right {
     right: 10px;
 }
 
-.arrow:hover {
+.home-arrow:hover {
     background: rgba(255, 255, 255, 1);
 }
 
@@ -66,38 +67,42 @@
 }
 
 /* Recommended Products Section */
-.recommended-products {
+.home-recommended-products {
     width: 90%;
     text-align: center;
     margin-top: 50px;
 }
 
-.recommended-products h2 {
+.home-recommended-products h2 {
     font-size: 28px;
     color: #222;
     margin-bottom: 20px;
+}
+.home-recommended-products p {
+    color: #666;
+    font-size: 18px;
 }
 
 /* Liked Products Section */
-.liked-products {
+.home-liked-products {
     width: 90%;
     text-align: center;
     margin-top: 50px;
 }
 
-.liked-products h2 {
+.home-liked-products h2 {
     font-size: 28px;
     color: #222;
     margin-bottom: 20px;
 }
 
-.liked-products p {
+.home-liked-products p {
     color: #666;
     font-size: 18px;
 }
 
 /* Grid Layout for Product Cards */
-.product-grid {
+.home-product-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 20px;
@@ -106,22 +111,37 @@
 }
 
 /* Product Card Styling */
-.product-card {
+.home-product-card {
     background: white;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease-in-out;
     cursor: pointer;
+    height: 300px;
+    width: 250px; /* Fixed width for uniformity */
 }
 
-.product-card img {
+.home-product-card img {
     width: 100%;
-    height: 100%;
+    height: 200px;
     object-fit: cover;
 }
 
-.product-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+.home-product-info {
+    padding: 10px;
+    text-align: center;
+}
+
+.home-product-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.home-product-cost {
+    font-size: 14px;
+    color: #007b5e;
+    font-weight: 500;
 }

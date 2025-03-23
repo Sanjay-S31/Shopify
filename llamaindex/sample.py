@@ -1,5 +1,6 @@
 import json
 import time
+import os
 import certifi
 from pymongo import MongoClient
 from llama_index.readers.mongodb import SimpleMongoReader
@@ -17,7 +18,7 @@ load_dotenv()
 Settings.embed_model = OpenAIEmbedding(model_name="text-embedding-ada-002")
 
 # MongoDB Atlas connection
-uri = "mongodb+srv://Sanjay:Sanjay@mongodbcluster.5xiq1.mongodb.net/EcommerceDB?retryWrites=true&w=majority&appName=MongoDBCluster"
+uri = os.getenv("MONGODB_URL")
 client = MongoClient(uri, tlsCAFile=certifi.where())
 reader = SimpleMongoReader(uri=uri)
 
