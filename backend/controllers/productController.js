@@ -178,10 +178,8 @@ const addReviewToProduct = async (req, res) => {
         }
 
         // Check if negative reviews exceed threshold (3)
-        if (product.negativeReviewCount > 3) {
-            console.log("hi machi")
+        if (product.negativeReviewCount > 5) {
             await Product.findByIdAndDelete(id);
-            console.log("hi machi")
             return res.status(200).json({ message: "Product deleted due to excessive negative reviews." });
         }
 

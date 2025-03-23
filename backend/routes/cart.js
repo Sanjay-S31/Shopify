@@ -5,7 +5,7 @@ const {
     displayCartItems,
     addCartItem,
     removeCartItem,
-    removeAllItems
+    clearCartItems
 } = require('../controllers/cartController')
 
 const requireAuth = require('../middleware/requireAuth')
@@ -18,6 +18,6 @@ route.put('/add/:id' , addCartItem)
 
 route.put('/remove/:id' , removeCartItem)
 
-route.put('/remove' , removeAllItems)
+route.put('/removeItems', clearCartItems);
 
 module.exports = route

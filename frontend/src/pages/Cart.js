@@ -22,10 +22,9 @@ export default function Cart() {
                         'Authorization': `Bearer ${user.token}`,
                     }
                 });
-    
+
                 if (response.ok) {
                     const data = await response.json();
-                    // Set initial selectedQuantity to 1 for each product
                     const updatedData = data.map(item => ({
                         ...item,
                         selectedQuantity: 1
@@ -39,10 +38,10 @@ export default function Cart() {
                 console.error("Fetch cart items error:", error);
             }
         }
-    
+
         displayAll();
     }, [user.token]);
-    
+
     const calculateTotal = (products) => {
         const totalCost = products.reduce((acc, product) => acc + (product.cost * product.selectedQuantity), 0);
         setTotal(totalCost);
@@ -86,58 +85,52 @@ export default function Cart() {
     const showSwal = () => {
         withReactContent(Swal).fire({
             icon: 'success',
-            title: 'Thank You!',
-            text: 'Your order has been placed successfully. We appreciate your purchase!',
-            confirmButtonText: 'Continue Shopping'
+            title: 'Proceeding to Payment',
+            text: 'Redirecting you to the payment page...',
+            confirmButtonText: 'Continue'
         }).then((result) => {
             if (result.isConfirmed) {
-                removeCart();
-                navigate('/');
+                navigate('/payment');
             }
         });
     };
 
-    const removeCart = async () => {
-        const response = await fetch('/api/cart/remove', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
-            }
-        });
-
-        if (response.ok) {
-            console.log("Cart cleared successfully");
-            setCartProduct([]);
-            setTotal(0);
-        } else {
-            console.log("Error occurred while clearing cart");
-        }
+    const handleGoHome = () => {
+        navigate('/');
     };
 
     return (
         <div className="cart-page">
-            {cartProduct && cartProduct.map(item => (
-                <div key={item._id} className="cart-items">
-                    <div className="cart-item-img">
-                        <img src={item.productImage} alt={item.productName} />
-                    </div>
-                    <div className="cart-item-info">
-                        <h1>{item.productName}</h1>
-                        <h3>Cost: <FaRupeeSign />{item.cost}</h3>
-                        <div className="quantity-controls">
-                            <button onClick={() => handleQuantityChange(item._id, -1)}>-</button>
-                            <span>{item.selectedQuantity}</span>
-                            <button onClick={() => handleQuantityChange(item._id, 1)}>+</button>
-                        </div>
-                    </div>
-                    <button className="cart-remove-button" onClick={() => handleRemove(item._id)}>Remove</button>
+            {cartProduct.length === 0 ? (
+                <div className="empty-cart">
+                    <h2>Your cart is empty.</h2>
+                    <button className="go-home-button" onClick={handleGoHome}>Continue Shopping</button>
                 </div>
-            ))}
-            <div className="checkout-container">
-                <h3 className="total-amount">Total Amount: <FaRupeeSign />{total}</h3>
-                <button className="checkout-button" onClick={showSwal}>Checkout</button>
-            </div>
+            ) : (
+                <>
+                    {cartProduct.map(item => (
+                        <div key={item._id} className="cart-items">
+                            <div className="cart-item-img">
+                                <img src={item.productImage} alt={item.productName} />
+                            </div>
+                            <div className="cart-item-info">
+                                <h1>{item.productName}</h1>
+                                <h3>Cost: <FaRupeeSign />{item.cost}</h3>
+                                <div className="quantity-controls">
+                                    <button onClick={() => handleQuantityChange(item._id, -1)}>-</button>
+                                    <span>{item.selectedQuantity}</span>
+                                    <button onClick={() => handleQuantityChange(item._id, 1)}>+</button>
+                                </div>
+                            </div>
+                            <button className="cart-remove-button" onClick={() => handleRemove(item._id)}>Remove</button>
+                        </div>
+                    ))}
+                    <div className="checkout-container">
+                        <h3 className="total-amount">Total Amount: <FaRupeeSign />{total}</h3>
+                        <button className="checkout-button" onClick={showSwal}>Checkout</button>
+                    </div>
+                </>
+            )}
         </div>
     );
 }

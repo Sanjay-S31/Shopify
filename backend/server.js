@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const userRouter = require('./routes/user')
 const productRouter = require('./routes/products')
 const cartController = require('./routes/cart')
+const orderController = require('./routes/order');
 const app = express()
 
 app.use(express.json({limit : '20mb'}))
@@ -25,3 +26,4 @@ mongoose.connect(process.env.MONGO_CONN)
 app.use('/api/user' , userRouter)
 app.use('/api/products' , productRouter)
 app.use('/api/cart' , cartController)
+app.use('/api/orders', orderController);

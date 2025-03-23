@@ -10,6 +10,9 @@ import ArtisanUpload from './pages/ArtisanUpload';
 import Products from './pages/Products';
 import SingleProduct from './components/SingleProduct';
 import Cart from './pages/Cart';
+import Payment from './pages/Payment';
+import Order from './pages/Order';
+import AdminOrders from "./pages/AdminOrders";
 
 function App() {
 
@@ -52,6 +55,18 @@ function App() {
           <Route
             path='/product/:id'
             element={user ? <SingleProduct /> : <Navigate to="/" />}
+          />
+          <Route
+            path='/payment'
+            element={user ? <Payment /> : <Navigate to="/login" />}
+          />
+          <Route 
+            path="/order" 
+            element={user ? <Order /> : <Navigate to="/login" />} 
+          />
+          <Route 
+              path="/admin-orders" 
+              element={user ? <AdminOrders /> : <Navigate to="/" />} 
           />
         </Routes>
       </div>

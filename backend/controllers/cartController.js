@@ -63,22 +63,28 @@ const removeCartItem = async (req, res) => {
     }
 }
 
-// Remove all items from cart (e.g., after checkout)
-const removeAllItems = async (req, res) => {
-    const userId = req.user._id
+// removes or clears all the cart items for the user
+const clearCartItems = async (req, res) => {
+	const userId = req.user._id;
 
-    try {
-        await User.findByIdAndUpdate(userId, { cart_items: [] })
-        res.status(200).json({ msg: "Cart cleared" })
-    } catch (error) {
-        console.error("Error clearing cart:", error)
-        res.status(500).json({ error: "Failed to clear cart" })
-    }
-}
+	try {
+		const user = await User.findById(userId);
+
+		// Clear all items in cart_items array
+		user.cart_items = [];
+		await user.save();
+
+		res.status(200).json({ message: "Cart cleared successfully", cart_items: user.cart_items });
+	} catch (error) {
+		console.error("Error clearing cart:", error);
+		res.status(500).json({ error: "Failed to clear cart" });
+	}
+};
+
 
 module.exports = {
     displayCartItems,
     addCartItem,
     removeCartItem,
-    removeAllItems
+    clearCartItems
 }

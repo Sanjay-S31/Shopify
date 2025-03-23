@@ -152,3 +152,28 @@
 .checkout-button:focus {
     outline: none;
 }
+
+.empty-cart {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.empty-cart h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.go-home-button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.go-home-button:hover {
+    background-color: #0056b3;
+}
