@@ -11,7 +11,7 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.embeddings.openai import OpenAIEmbedding  # type: ignore
 from dotenv import load_dotenv
 from bson import ObjectId
-
+from flask import Flask, jsonify
 load_dotenv()
 
 # Set up embedding model
@@ -22,6 +22,50 @@ uri = os.getenv("MONGODB_URL")
 client = MongoClient(uri, tlsCAFile=certifi.where())
 reader = SimpleMongoReader(uri=uri)
 
+
+def chatbot_query(query):
+    print(f"Processing query: {query}")
+    
+    try:
+        # Configure database and collection
+        db = client["EcommerceDB"]
+        products_collection = db["products"]
+        
+        # Prepare query text
+        query_text = f"Return a JSON response with key as abcd to the question after retrieving : {query}. if you dont know reply i dont know"
+        
+        # Load product fields
+        product_fields = ["_id", "productName", "productType", "description", "cost", "tags", "inCart","quantity"]
+        products_docs = reader.load_data("EcommerceDB", "products", field_names=product_fields)
+        
+        # Create index and query engine
+        index = VectorStoreIndex.from_documents(products_docs)
+        retriever = VectorIndexRetriever(index=index, similarity_top_k=100)
+        response_synthesizer = get_response_synthesizer(response_mode="compact")
+        query_engine = RetrieverQueryEngine(retriever=retriever, response_synthesizer=response_synthesizer)
+        
+        print("[DEBUG] Calling OpenAI API for similarity search...")
+        start_time = time.time()
+        response = query_engine.query(query_text)
+        end_time = time.time()
+        
+        print(f"OpenAI API call completed in {end_time - start_time:.2f} seconds.")
+        try:
+            res = json.loads(response.response)  
+            print(res)
+            if not isinstance(res, str):
+                recommended_products = ""  
+        except json.JSONDecodeError:
+            recommended_products = ""  # Handle case where response isn't valid JSON
+
+        return {"recommend": res}
+    except Exception as e:
+        print(f"[ERROR] An error occurred: {e}")
+        return {"error": str(e)}
+    
+        
+        
+    
 def get_similar_products(product_ids):
     print("Recieved Product IDs: ",product_ids)
     """
@@ -72,6 +116,7 @@ def get_similar_products(product_ids):
          # Ensure response is a JSON array
         try:
             recommended_products = json.loads(response.response)  # Convert string to list
+            print(recommended_products)
             if not isinstance(recommended_products, list):
                 recommended_products = []  # Ensure it is always a list
         except json.JSONDecodeError:

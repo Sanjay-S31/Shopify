@@ -1,13 +1,16 @@
 from flask import Flask, request, jsonify
-from sample import get_similar_products  # Import the function
+import logging
+from flask_cors import CORS 
+from sample import get_similar_products,chatbot_query  # Import the function
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 app = Flask(__name__)
+CORS(app)
 analyzer = SentimentIntensityAnalyzer()
 @app.route("/update-products", methods=["POST"])
 def update_products():
     try:
         data = request.json
-        user_id = data.get("userId")
+        user_id = data.get("userId")    
         product_ids = data.get("productIds")
 
         if not user_id or not product_ids:
@@ -45,6 +48,32 @@ def analyze_review():
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+logger = logging.getLogger(__name__)
+
+@app.route("/chatbotresponse", methods=["POST"])
+def chatreply():
+    try:
+        # Log the full request for debugging
+        logger.info(f"Received chatbot request: {request.json}")
+
+        # Get JSON data with error handling
+        data = request.get_json(force=True, silent=True)
+
+        if not data:
+            return jsonify({"error": "No JSON data received"}), 400
+
+        user_query = data.get("query", "")
+
+        # Call the chatbot query function with user's query
+        result = chatbot_query(user_query)
+        return result, 200
+
+    except Exception as e:
+        # Log the error details
+        logger.error(f"Chatbot response error: {str(e)}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

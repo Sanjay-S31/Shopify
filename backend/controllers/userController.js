@@ -41,7 +41,7 @@ const signupUser = async (req, res) => {
         const token = createToken(user._id)
 
         res.status(200).json({ username, userType, email, token })
-    }
+    } 
     catch (err) {
         res.status(400).json({ error: err.message })
     }
@@ -191,6 +191,7 @@ const changePassword = async (req, res) => {
 const getRecommendedProducts = async (req, res) => {
     const userId = req.user._id;
     
+    
     try {
         // Find the recommended products for the user
         const recommendation = await Recommendation.findOne({ userId });
@@ -210,7 +211,6 @@ const getRecommendedProducts = async (req, res) => {
 };
 
 
-
 module.exports = {
     loginUser,
     signupUser,
@@ -220,5 +220,5 @@ module.exports = {
     getUserProfile,
     editUserProfile,
     changePassword,
-    getRecommendedProducts
+    getRecommendedProducts,
 };

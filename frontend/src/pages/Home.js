@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useNavigate } from "react-router-dom";
 import "./style_pages/home.css";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-
+import { FaChevronLeft, FaChevronRight, FaRobot } from "react-icons/fa";
 import img1 from "../assets/img1.jpg";
 import img2 from "../assets/img2.jpg";
 import img3 from "../assets/img3.jpg";
@@ -18,6 +17,19 @@ export default function Home() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [likedProducts, setLikedProducts] = useState([]);
     const [recommendedProducts, setRecommendedProducts] = useState([]);
+    const [showChatbot, setShowChatbot] = useState(false);
+    // New states for chatbot functionality
+    const [messages, setMessages] = useState([
+        { text: "How can I assist you with your shopping today?", sender: "bot" }
+    ]);
+    const [inputValue, setInputValue] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const messagesEndRef = useRef(null);
+
+    // Scroll to bottom of messages when new messages are added
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -26,6 +38,7 @@ export default function Home() {
         return () => clearInterval(interval);
     }, [currentIndex]);
 
+    // Your existing useEffects for products...
     useEffect(() => {
         const fetchLikedProducts = async () => {
             try {
@@ -66,7 +79,7 @@ export default function Home() {
     useEffect(() => {
         const fetchRecommendedProducts = async () => {
             if (!user || !user.token) return;
-
+            console.log("hiiiiiiiii")
             try {
                 const res = await fetch("/api/user/recommendation", {
                     method: "GET",
@@ -75,7 +88,7 @@ export default function Home() {
                         Authorization: `Bearer ${user.token}`,
                     },
                 });
-
+                console.log(res)
                 if (!res.ok) {
                     throw new Error("Failed to fetch recommended products");
                 }
@@ -106,6 +119,74 @@ export default function Home() {
     const handleProductClick = (productId) => {
         navigate(`/product/${productId}`);
     };
+
+    const handleChatbotClick = () => {
+        setShowChatbot(!showChatbot);
+    };
+
+    // New function to handle input changes
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+    };
+
+    // New function to handle sending messages
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        if (!inputValue.trim() || isLoading) return;
+    
+        // Add user message to chat
+        console.log(inputValue);
+        const userMessage = { text: inputValue, sender: "user" };
+        setMessages((prevMessages) => [...prevMessages, userMessage]);
+    
+        // Clear input and set loading state
+        const userQuery = inputValue;
+        setInputValue("");
+        setIsLoading(true);
+    
+        try {
+            // Ensure the URL for the Flask backend is correct
+            const response = await fetch("http://localhost:5000/chatbotresponse", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: user?.token ? `Bearer ${user.token}` : "",
+                },
+                body: JSON.stringify({
+                    query: userQuery,
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to get chatbot response");
+            }
+    
+            const data = await response.json();
+            console.log(data)
+            // Assuming the response has a 'response' field (check your Flask backend for the exact structure)
+            let botResponseText = data.recommend.abcd || "No response from the bot.";
+    
+            // Add bot response to messages
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                { text: botResponseText, sender: "bot" },
+            ]);
+        } catch (error) {
+            console.error("Error getting chatbot response:", error);
+    
+            // Add a fallback message for error
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                    text: "Sorry, I'm having trouble connecting to my backend. Please try again later.",
+                    sender: "bot",
+                },
+            ]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
 
     return (
         <div className="homepage">
@@ -167,6 +248,51 @@ export default function Home() {
                     </div>
                 )}
             </div>
+
+            {/* Chatbot Button */}
+            <button className="chatbot-btn" onClick={handleChatbotClick}>
+                <FaRobot />
+            </button>
+
+            {/* Enhanced Chatbot Interface */}
+            {showChatbot && (
+                <div className="chatbot-interface">
+                    <div className="chatbot-header">
+                        <h3>Shopping Assistant</h3>
+                        <button onClick={handleChatbotClick}>X</button>
+                    </div>
+                    <div className="chatbot-messages">
+                        {messages.map((message, index) => (
+                            <div 
+                                key={index} 
+                                className={`message ${message.sender === "user" ? "user-message" : "bot-message"}`}
+                            >
+                                {message.text}
+                            </div>
+                        ))}
+                        {isLoading && (
+                            <div className="message bot-message loading-message">
+                                <span className="loading-dot"></span>
+                                <span className="loading-dot"></span>
+                                <span className="loading-dot"></span>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+                    <form className="chatbot-input" onSubmit={handleSendMessage}>
+                        <input
+                            type="text"
+                            value={inputValue}
+                            onChange={handleInputChange}
+                            placeholder="Type your message here..."
+                            disabled={isLoading}
+                        />
+                        <button type="submit" disabled={isLoading}>
+                            {isLoading ? "..." : "Send"}
+                        </button>
+                    </form>
+                </div>
+            )}
         </div>
     );
 }

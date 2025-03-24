@@ -83,7 +83,7 @@ export default function SingleProduct() {
             const data = await response.json();
 
             if (response.ok && data) {
-                navigate('/cart');
+                navigate('/products');
             } else {
                 console.log("Error occurred during the purchase");
             }
@@ -193,7 +193,7 @@ export default function SingleProduct() {
                     </div>
                     
                     <button className="buy-button" onClick={handleBuy}>
-                        <FaShoppingCart style={{ marginRight: '8px' }} /> Buy Now
+                        <FaShoppingCart style={{ marginRight: '8px' }} /> Add to Cart
                     </button>
 
                     <div className="review-section">
