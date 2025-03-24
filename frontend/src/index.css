@@ -4,6 +4,11 @@
   font-family: 'Poppins', sans-serif;
 }
 
+/* used to remove the scrollbar in the side of the page */
+body::-webkit-scrollbar {
+  display: none; 
+}
+
 /* navbar component */
 
 nav {

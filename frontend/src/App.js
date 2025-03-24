@@ -45,7 +45,7 @@ function App() {
             element={user ? <ArtisanUpload /> : <Navigate to="/" />}
           />
           <Route
-            path='/product'
+            path='/products'
             element={user ? <Products /> : <Navigate to="/" />}
           />
           <Route
@@ -61,7 +61,7 @@ function App() {
             element={user ? <Payment /> : <Navigate to="/login" />}
           />
           <Route 
-            path="/order" 
+            path="/orders" 
             element={user ? <Order /> : <Navigate to="/login" />} 
           />
           <Route 

@@ -85,27 +85,12 @@
 }
 
 .product-description-container p {
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+    font-weight: bold;
 }
 
-.truncated-description {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 100%;
-    display: inline-block;
-}
-
-/* See more/less button */
-.toggle-description-btn {
-    background: none;
-    border: none;
-    color: #007bff;
-    cursor: pointer;
-    font-size: 0.85em;
-    margin-top: 4px;
-    padding: 0;
-    text-align: left;
+.full-description {
+    margin-left: 32px;
 }
 
 /* Center the image */
@@ -151,7 +136,7 @@ body.active-modal {
     /* Prevents scrolling when modal is open */
 }
 
-.modal {
+.update-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -164,7 +149,7 @@ body.active-modal {
     z-index: 1000;
 }
 
-.overlay {
+.update-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -172,7 +157,7 @@ body.active-modal {
     height: 100%;
 }
 
-.modal-content {
+.update-modal-content {
     position: relative;
     background-color: #fff;
     padding: 20px;
@@ -185,26 +170,25 @@ body.active-modal {
     z-index: 1001;
 }
 
-.modal-content h2 {
+.update-modal-content h2 {
     text-align: center;
     margin-bottom: 20px;
 }
 
-.modal-content form .form-group {
+.update-form-group {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
 }
 
-.modal-content form label {
+.update-modal-content form label {
     font-weight: bold;
     width: 30%;
-    margin-right: 10px;
     margin-top: 0;
 }
 
-.modal-content form input,
-.modal-content form textarea {
+.update-modal-content form input,
+.update-modal-content form textarea {
     width: 70%;
     padding: 8px;
     border: 1px solid #ccc;
@@ -212,12 +196,12 @@ body.active-modal {
     margin-top: 0;
 }
 
-.modal-content form textarea {
+.update-modal-content form textarea {
     resize: vertical;
     min-height: 70px;
 }
 
-.modal-content form button {
+.update-modal-content form button {
     margin-top: 15px;
     background-color: #007bff;
     color: white;
@@ -228,7 +212,7 @@ body.active-modal {
     width: 100%;
 }
 
-.close-modal {
+.update-close-modal {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -240,16 +224,16 @@ body.active-modal {
     cursor: pointer;
 }
 
-.modal-content form img {
+.update-modal-content form img {
     display: block;
     max-width: 70%;
     height: auto;
     margin: 10px auto;
     border-radius: 4px;
     max-height: 150px;
-    /* Reduced image size */
     object-fit: contain;
 }
+
 
 /* Media queries for responsiveness */
 @media (max-width: 1200px) {

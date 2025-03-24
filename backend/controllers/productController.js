@@ -1,6 +1,9 @@
 const Product = require('../models/productModel')
 const mongoose = require('mongoose')
 const axios = require("axios");
+const path = require('path');
+const fs = require('fs');
+
 const getProducts = async (req,res) => {
 
     const user_id = req.user._id
@@ -128,6 +131,45 @@ const searchProduct = async (req,res) => {
     }
 }
 
+// searching the product based on the image given by the user
+
+const searchProductImage = async (req,res) => {
+    const { image } = req.body;
+
+    if (!image) {
+        return res.status(400).json({ error: "Missing image data" });
+    }
+
+    const matches = image.match(/^data:(.+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+        return res.status(400).json({ error: "Invalid image format" });
+    }
+
+    const imageBuffer = Buffer.from(matches[2], 'base64');
+    const mimeType = matches[1];
+    let extension = '.png';  // default extension
+
+    if (mimeType === 'image/jpeg') extension = '.jpg';
+    else if (mimeType === 'image/webp') extension = '.webp';
+
+    const uniqueFilename = 'image-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + extension;
+
+    const dir = path.join(__dirname, '..', 'images');
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+
+    const filePath = path.join(dir, uniqueFilename);
+
+    fs.writeFile(filePath, imageBuffer, (err) => {
+        if (err) {
+            console.error("Error saving image:", err);
+            return res.status(500).json({ error: "Failed to save image" });
+        }
+        res.status(200).json({ message: "Image uploaded successfully", filename: uniqueFilename });
+    });
+}
+
 // filtering the product based on category
 const getProductsByCategory = async (req, res) => {
     try {
@@ -199,6 +241,7 @@ module.exports = {
     deleteProduct,
     updateProduct,
     searchProduct,
+    searchProductImage,
     getProductsByCategory,
     addReviewToProduct
 }

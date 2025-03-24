@@ -15,13 +15,11 @@ const ProductDetails = ({ product }) => {
     const [productImage, setProductImage] = useState(product.productImage);
 
     const [modal, setModal] = useState(false);
-    const [showFullDesc, setShowFullDesc] = useState(false);
 
     const { dispatch } = useProductsContext();
     const { user } = useAuthContext();
 
     const toggleModal = () => setModal(!modal);
-    const toggleDescription = () => setShowFullDesc(!showFullDesc);
 
     // Effect to manage body class for modal
     useEffect(() => {
@@ -106,14 +104,12 @@ const ProductDetails = ({ product }) => {
 
                 <div className='product-description-container'>
                     <p><strong>Description:</strong></p>
-                    <span className={showFullDesc ? '' : 'truncated-description'}>
-                        {description}
+                    <span className="full-description">
+                        {description.length > 30
+                            ? description.slice(0, 30) + '...' 
+                            : description
+                        }
                     </span>
-                    {description.length > 30 && (
-                        <button className='toggle-description-btn' onClick={toggleDescription}>
-                            {showFullDesc ? 'See less' : 'See more'}
-                        </button>
-                    )}
                 </div>
 
                 <p><strong>Cost:</strong> ₹{product.cost}</p>
@@ -130,12 +126,12 @@ const ProductDetails = ({ product }) => {
 
             {/* Modal with updated form structure */}
             {modal && (
-                <div className='modal'>
-                    <div onClick={toggleModal} className='overlay'></div>
-                    <div className='modal-content'>
+                <div className='update-modal'>
+                    <div onClick={toggleModal} className='update-overlay'></div>
+                    <div className='update-modal-content'>
                         <h2>Update Product</h2>
                         <form onSubmit={handleUpdate}>
-                            <div className="form-group">
+                            <div className="update-form-group">
                                 <label>Product Name:</label>
                                 <input
                                     type="text"
@@ -143,8 +139,7 @@ const ProductDetails = ({ product }) => {
                                     onChange={(e) => setProductName(e.target.value)}
                                 />
                             </div>
-                            
-                            <div className="form-group">
+                            <div className="update-form-group">
                                 <label>Product Type:</label>
                                 <input
                                     type="text"
@@ -152,16 +147,14 @@ const ProductDetails = ({ product }) => {
                                     onChange={(e) => setProductType(e.target.value)}
                                 />
                             </div>
-                            
-                            <div className="form-group">
+                            <div className="update-form-group">
                                 <label>Description:</label>
                                 <textarea
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                 />
                             </div>
-                            
-                            <div className="form-group">
+                            <div className="update-form-group">
                                 <label>Cost:</label>
                                 <input
                                     type="number"
@@ -169,8 +162,7 @@ const ProductDetails = ({ product }) => {
                                     onChange={(e) => setCost(e.target.value)}
                                 />
                             </div>
-                            
-                            <div className="form-group">
+                            <div className="update-form-group">
                                 <label>Quantity:</label>
                                 <input
                                     type="number"
@@ -178,8 +170,7 @@ const ProductDetails = ({ product }) => {
                                     onChange={(e) => setQuantity(e.target.value)}
                                 />
                             </div>
-                            
-                            <div className="form-group">
+                            <div className="update-form-group">
                                 <label>Tags:</label>
                                 <input
                                     type="text"
@@ -187,8 +178,7 @@ const ProductDetails = ({ product }) => {
                                     onChange={(e) => setTags(e.target.value)}
                                 />
                             </div>
-                            
-                            <div className="form-group">
+                            <div className="update-form-group">
                                 <label>Image Upload:</label>
                                 <input
                                     type='file'
@@ -196,11 +186,10 @@ const ProductDetails = ({ product }) => {
                                     onChange={handleUploadImage}
                                 />
                             </div>
-                            
                             {productImage && <img src={productImage} alt='product' />}
                             <button type="submit">Submit</button>
                         </form>
-                        <button onClick={toggleModal} className='close-modal'>X</button>
+                        <button onClick={toggleModal} className='update-close-modal'>X</button>
                     </div>
                 </div>
             )}

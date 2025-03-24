@@ -93,13 +93,13 @@ export default function Order() {
     const getStatusIcon = (status) => {
         switch (status) {
             case 'processing':
-                return <FaBoxOpen className="status-icon processing" />;
+                return <FaBoxOpen className="user-status-icon user-processing" />;
             case 'shipped':
-                return <FaShippingFast className="status-icon shipped" />;
+                return <FaShippingFast className="user-status-icon user-shipped" />;
             case 'delivered':
-                return <FaCheckCircle className="status-icon delivered" />;
+                return <FaCheckCircle className="user-status-icon user-delivered" />;
             case 'cancelled':
-                return <FaTimesCircle className="status-icon cancelled" />;
+                return <FaTimesCircle className="user-status-icon user-cancelled" />;
             default:
                 return null;
         }
@@ -111,45 +111,45 @@ export default function Order() {
     };
 
     if (loading) {
-        return <div className="order-loading">Loading your orders...</div>;
+        return <div className="user-order-loading">Loading your orders...</div>;
     }
 
     if (error) {
-        return <div className="order-error">Error: {error}</div>;
+        return <div className="user-order-error">Error: {error}</div>;
     }
 
     return (
-        <div className="order-page">
-            <h1 className="page-title">My Orders</h1>
+        <div className="user-order-page">
+            <h1 className="user-page-title">My Orders</h1>
             
             {orders.length === 0 ? (
-                <div className="no-orders">
+                <div className="user-no-orders">
                     <h2>You haven't placed any orders yet</h2>
                     <p>Once you place an order, you'll be able to track it here.</p>
-                    <Link to="/" className="shop-now-btn">Shop Now</Link>
+                    <Link to="/" className="user-shop-now-btn">Shop Now</Link>
                 </div>
             ) : (
-                <div className="order-container">
-                    <div className="order-list">
+                <div className="user-order-container">
+                    <div className="user-order-list">
                         <h2>Order History</h2>
                         {orders.map(order => (
                             <div 
                                 key={order._id} 
-                                className={`order-item ${selectedOrder && selectedOrder._id === order._id ? 'selected' : ''}`}
+                                className={`user-order-item ${selectedOrder && selectedOrder._id === order._id ? 'user-selected' : ''}`}
                                 onClick={() => handleViewOrder(order)}
                             >
-                                <div className="order-item-header">
-                                    <div className="order-date">{formatDate(order.orderDate)}</div>
-                                    <div className={`order-status ${order.orderStatus}`}>
+                                <div className="user-order-item-header">
+                                    <div className="user-order-date">{formatDate(order.orderDate)}</div>
+                                    <div className={`user-order-status ${order.orderStatus}`}>
                                         {getStatusIcon(order.orderStatus)}
                                         <span>{order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}</span>
                                     </div>
                                 </div>
-                                <div className="order-item-content">
-                                    <div className="order-amount">
+                                <div className="user-order-item-content">
+                                    <div className="user-order-amount">
                                         <FaRupeeSign /> {order.totalAmount}
                                     </div>
-                                    <div className="order-items-count">
+                                    <div className="user-order-items-count">
                                         {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
                                     </div>
                                 </div>
@@ -157,51 +157,51 @@ export default function Order() {
                         ))}
                     </div>
                     
-                    <div className="order-details">
+                    <div className="user-order-details">
                         {selectedOrder && (
                             <>
-                                <div className="order-details-header">
+                                <div className="user-order-details-header">
                                     <h2>Order Details</h2>
-                                    <div className="order-id">ID: {selectedOrder._id}</div>
+                                    <div className="user-order-id">ID: {selectedOrder._id}</div>
                                 </div>
                                 
-                                <div className="order-status-timeline">
-                                    <div className={`timeline-item ${selectedOrder.orderStatus === 'processing' || selectedOrder.orderStatus === 'shipped' || selectedOrder.orderStatus === 'delivered' ? 'active' : ''}`}>
-                                        <div className="timeline-icon">
+                                <div className="user-order-status-timeline">
+                                    <div className={`user-timeline-item ${selectedOrder.orderStatus === 'processing' || selectedOrder.orderStatus === 'shipped' || selectedOrder.orderStatus === 'delivered' ? 'user-active' : ''}`}>
+                                        <div className="user-timeline-icon">
                                             <FaBoxOpen />
                                         </div>
-                                        <div className="timeline-content">
+                                        <div className="user-timeline-content">
                                             <h4>Processing</h4>
                                             <p>Order confirmed and being processed</p>
                                         </div>
                                     </div>
                                     
-                                    <div className={`timeline-item ${selectedOrder.orderStatus === 'shipped' || selectedOrder.orderStatus === 'delivered' ? 'active' : ''}`}>
-                                        <div className="timeline-icon">
+                                    <div className={`user-timeline-item ${selectedOrder.orderStatus === 'shipped' || selectedOrder.orderStatus === 'delivered' ? 'user-active' : ''}`}>
+                                        <div className="user-timeline-icon">
                                             <FaShippingFast />
                                         </div>
-                                        <div className="timeline-content">
+                                        <div className="user-timeline-content">
                                             <h4>Shipped</h4>
                                             <p>Your order is on the way</p>
                                         </div>
                                     </div>
                                     
-                                    <div className={`timeline-item ${selectedOrder.orderStatus === 'delivered' ? 'active' : ''}`}>
-                                        <div className="timeline-icon">
+                                    <div className={`user-timeline-item ${selectedOrder.orderStatus === 'delivered' ? 'user-active' : ''}`}>
+                                        <div className="user-timeline-icon">
                                             <FaCheckCircle />
                                         </div>
-                                        <div className="timeline-content">
+                                        <div className="user-timeline-content">
                                             <h4>Delivered</h4>
                                             <p>{selectedOrder.deliveryDate ? `Delivered on ${formatDate(selectedOrder.deliveryDate)}` : 'Will be delivered soon'}</p>
                                         </div>
                                     </div>
                                     
                                     {selectedOrder.orderStatus === 'cancelled' && (
-                                        <div className="timeline-item cancelled active">
-                                            <div className="timeline-icon">
+                                        <div className="user-timeline-item user-cancelled user-active">
+                                            <div className="user-timeline-icon">
                                                 <FaTimesCircle />
                                             </div>
-                                            <div className="timeline-content">
+                                            <div className="user-timeline-content">
                                                 <h4>Cancelled</h4>
                                                 <p>This order has been cancelled</p>
                                             </div>
@@ -209,19 +209,19 @@ export default function Order() {
                                     )}
                                 </div>
                                 
-                                <div className="order-sections">
-                                    <div className="order-items-section">
+                                <div className="user-order-sections">
+                                    <div className="user-order-items-section">
                                         <h3>Items</h3>
-                                        <div className="ordered-items">
+                                        <div className="user-ordered-items">
                                             {selectedOrder.items.map((item, index) => (
-                                                <div key={index} className="ordered-item">
-                                                    <div className="ordered-item-image">
+                                                <div key={index} className="user-ordered-item">
+                                                    <div className="user-ordered-item-image">
                                                         <img src={item.productImage} alt={item.productName} />
                                                     </div>
-                                                    <div className="ordered-item-details">
-                                                        <div className="ordered-item-name">{item.productName}</div>
-                                                        <div className="ordered-item-quantity">Qty: {item.quantity}</div>
-                                                        <div className="ordered-item-price">
+                                                    <div className="user-ordered-item-details">
+                                                        <div className="user-ordered-item-name">{item.productName}</div>
+                                                        <div className="user-ordered-item-quantity">Qty: {item.quantity}</div>
+                                                        <div className="user-ordered-item-price">
                                                             <FaRupeeSign /> {item.cost}
                                                         </div>
                                                     </div>
@@ -230,33 +230,33 @@ export default function Order() {
                                         </div>
                                     </div>
                                     
-                                    <div className="order-info-section">
-                                        <div className="shipping-info">
+                                    <div className="user-order-info-section">
+                                        <div className="user-shipping-info">
                                             <h3>Shipping Address</h3>
-                                            <p className="recipient-name">{selectedOrder.shippingInfo.name}</p>
-                                            <p className="address-line">{selectedOrder.shippingInfo.address}</p>
-                                            <p className="address-line">
+                                            <p className="user-recipient-name">{selectedOrder.shippingInfo.name}</p>
+                                            <p className="user-address-line">{selectedOrder.shippingInfo.address}</p>
+                                            <p className="user-address-line">
                                                 {selectedOrder.shippingInfo.city}{selectedOrder.shippingInfo.city && selectedOrder.shippingInfo.state ? ', ' : ''}
                                                 {selectedOrder.shippingInfo.state} {selectedOrder.shippingInfo.pincode}
                                             </p>
-                                            <p className="mobile">Mobile: {selectedOrder.shippingInfo.mobile}</p>
+                                            <p className="user-mobile">Mobile: {selectedOrder.shippingInfo.mobile}</p>
                                         </div>
                                         
-                                        <div className="payment-info">
+                                        <div className="user-payment-info">
                                             <h3>Payment Details</h3>
-                                            <div className="payment-row">
+                                            <div className="user-payment-row">
                                                 <span>Method:</span>
                                                 <span>{selectedOrder.paymentMethod === 'cod' ? 'Cash on Delivery' : 
                                                        selectedOrder.paymentMethod === 'card' ? 'Credit/Debit Card' : 
                                                        selectedOrder.paymentMethod === 'upi' ? 'UPI' : selectedOrder.paymentMethod}</span>
                                             </div>
-                                            <div className="payment-row">
+                                            <div className="user-payment-row">
                                                 <span>Status:</span>
-                                                <span className={`payment-status ${selectedOrder.paymentStatus}`}>
+                                                <span className={`user-payment-status ${selectedOrder.paymentStatus}`}>
                                                     {selectedOrder.paymentStatus.charAt(0).toUpperCase() + selectedOrder.paymentStatus.slice(1)}
                                                 </span>
                                             </div>
-                                            <div className="payment-row total">
+                                            <div className="user-payment-row user-total">
                                                 <span>Total:</span>
                                                 <span><FaRupeeSign /> {selectedOrder.totalAmount}</span>
                                             </div>
@@ -265,9 +265,9 @@ export default function Order() {
                                 </div>
                                 
                                 {selectedOrder.orderStatus === 'processing' && (
-                                    <div className="order-actions">
+                                    <div className="user-order-actions">
                                         <button 
-                                            className="cancel-order-btn" 
+                                            className="user-cancel-order-btn" 
                                             onClick={() => handleCancelOrder(selectedOrder._id)}
                                         >
                                             Cancel Order

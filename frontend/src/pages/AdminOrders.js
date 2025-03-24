@@ -121,23 +121,22 @@ export default function AdminOrders() {
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
-  if (loading) return <div className="loading">Loading orders...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (loading) return <div className="admin-loading">Loading orders...</div>;
+  if (error) return <div className="admin-error">Error: {error}</div>;
 
   return (
     <div className="admin-orders-container">
       <h1>Manage Customer Orders</h1>
 
-      <div className="orders-count">
+      <div className="admin-orders-count">
         <span>Total Orders: {orders.length}</span>
       </div>
 
-      <div className="orders-table-container">
-        <table className="orders-table">
+      <div className="admin-orders-table-container">
+        <table className="admin-orders-table">
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>Customer</th>
               <th>Date</th>
               <th>Items</th>
               <th>Total Amount</th>
@@ -150,44 +149,49 @@ export default function AdminOrders() {
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan="9" className="no-orders">No orders found</td>
+                <td colSpan="9" className="admin-no-orders">No orders found</td>
               </tr>
             ) : (
               orders.map((order) => {
-                const status = order.orderStatus || "processing"; // fallback status
+                const status = order.orderStatus || "processing";
                 return (
-                  <tr key={order._id} className={`status-${status.toLowerCase()}`}>
-                    <td className="order-id">#{order._id.substring(order._id.length - 6)}</td>
-                    <td>{order.user?.username || "Unknown"}</td>
+                  <tr key={order._id} className={`admin-status-${status.toLowerCase()}`}>
+                    <td className="admin-order-id">#{order._id.substring(order._id.length - 6)}</td>
                     <td>{formatDate(order.orderDate)}</td>
                     <td>
-                      <div className="order-items">
+                      <div className="admin-order-items">
                         {order.items.map((item, idx) => (
-                          <div key={idx} className="order-item">
-                            <span className="item-name">{item.productName}</span>
-                            <span className="item-quantity">×{item.quantity}</span>
+                          <div key={idx} className="admin-order-item">
+                            <span className="admin-item-name">{item.productName}</span>
+                            <span className="admin-item-quantity">×{item.quantity}</span>
                           </div>
                         ))}
                       </div>
                     </td>
-                    <td className="order-total">${order.totalAmount.toFixed(2)}</td>
-                    <td className="shipping-address">
+                    <td className="admin-order-total">{order.totalAmount.toFixed(2)}</td>
+                    <td className="admin-shipping-address">
                       <div>{order.shippingInfo.name}</div>
                       <div>{order.shippingInfo.address}</div>
                       <div>{order.shippingInfo.city}, {order.shippingInfo.state} {order.shippingInfo.pincode}</div>
                       <div>Mobile: {order.shippingInfo.mobile}</div>
                     </td>
-                    <td className="payment-info">
-                      <div>Method: {formatPaymentMethod(order.paymentMethod)}</div>
-                      <div className={`payment-status payment-${order.paymentStatus}`}>
+                    <td className="admin-payment-info">
+                      <div>
+                        <span className="admin-payment-method-label">Method:</span> {formatPaymentMethod(order.paymentMethod)}
+                      </div>
+                      <div className={`admin-payment-status admin-payment-${order.paymentStatus}`}>
                         Status: {order.paymentStatus.charAt(0).toUpperCase() + order.paymentStatus.slice(1)}
                       </div>
                     </td>
-                    <td className={`status status-${status.toLowerCase()}`}>
-                      {formatOrderStatus(status)}
+
+                    <td className="admin-status">
+                      <div className={`admin-status-label admin-status-${status.toLowerCase()}`}>
+                        {formatOrderStatus(status)}
+                      </div>
                     </td>
-                    <td className="actions">
-                      <div className="status-update">
+
+                    <td className="admin-actions">
+                      <div className="admin-status-update">
                         <select
                           value={selectedStatus[order._id] || status}
                           onChange={(e) => handleStatusChange(order._id, e.target.value)}
@@ -202,7 +206,7 @@ export default function AdminOrders() {
                         <button
                           onClick={() => updateOrderStatus(order._id)}
                           disabled={statusUpdating[order._id] || selectedStatus[order._id] === status}
-                          className="update-btn"
+                          className="admin-update-btn"
                         >
                           {statusUpdating[order._id] ? "Updating..." : "Update"}
                         </button>
