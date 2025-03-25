@@ -50,8 +50,12 @@ const productSchema = new Schema({
     negativeReviewCount : {
         type : Number,
         default : 0
-    }
+    },
+    productRatings: {
+        type: [Number],
+        default: []
+    },
+
 } , {timestamps : true})
 
 module.exports = mongoose.model('Product', productSchema)
-
