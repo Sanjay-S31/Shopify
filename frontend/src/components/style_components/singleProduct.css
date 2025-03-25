@@ -223,6 +223,8 @@
 }
 
 .review-item {
+    display: flex;
+    justify-content: space-between;
     padding: 15px;
     margin-bottom: 12px;
     border-radius: 8px;
@@ -237,6 +239,55 @@
     color: #888;
     font-style: italic;
 }
+
+/* Add these styles to your existing singleProduct.css */
+
+.star-icon {
+    font-size: 20px;
+    margin-right: 3px;
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+
+.star-icon.filled {
+    color: #ffc107;
+}
+
+.star-icon.empty {
+    color: #ddd;
+}
+
+.rating-input {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+.product-overall-rating {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+.rating-value {
+    margin-left: 8px;
+    color: #666;
+}
+
+.review-item .review-rating {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.review-item .review-rating .star-icon {
+    font-size: 16px;
+}
+
 
 /* Responsive design */
 @media (max-width: 992px) {
