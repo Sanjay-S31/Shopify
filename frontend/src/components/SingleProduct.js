@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaRupeeSign, FaHeart, FaShoppingCart } from "react-icons/fa";
+import { FaRupeeSign, FaHeart, FaShoppingCart, FaStar } from "react-icons/fa";
 import './style_components/singleProduct.css';
 
 export default function SingleProduct() {
@@ -13,7 +13,9 @@ export default function SingleProduct() {
     const [liked, setLiked] = useState(false);
     const [showReviews, setShowReviews] = useState(false);
     const [newReview, setNewReview] = useState('');
+    const [newRating, setNewRating] = useState(0);
     const [reviews, setReviews] = useState([]);
+    const [overallRating, setOverallRating] = useState(0);
 
     const fetchProductInfo = useCallback(async (id) => {
         try {
@@ -29,6 +31,13 @@ export default function SingleProduct() {
                 const result = await response.json();
                 setProduct(result);
                 setReviews(result.productReviews || []);
+
+                // Calculate overall rating
+                const totalRatings = result.productRatings || [];
+                const avgRating = totalRatings.length > 0 
+                    ? totalRatings.reduce((a, b) => a + b, 0) / totalRatings.length 
+                    : 0;
+                setOverallRating(avgRating);
 
                 // Add product ID to product_ids set (history or recent views)
                 await fetch('/api/user/addProductId', {
@@ -110,38 +119,61 @@ export default function SingleProduct() {
     };
     
     const handleAddReview = async () => {
-    if (!newReview.trim()) return;
+        if (!newReview.trim()) return;
 
-    try {
-        const response = await fetch('/api/products/addReview/' + id, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
-            },
-            body: JSON.stringify({ review: newReview })
-        });
+        try {
+            const response = await fetch('/api/products/addReview/' + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                },
+                body: JSON.stringify({ 
+                    review: newReview,
+                    rating: newRating 
+                })
+            });
 
-        const result = await response.json();
-        console.log(result)
-        if (response.ok) {
-            if (result.message === "Product deleted due to excessive negative reviews.") {
-                alert("This product has been removed due to too many negative reviews.");
-                navigate("/"); // Redirect to home page or product list
-            } else {
-                setProduct(result);
-                setReviews(result.productReviews);
-                setNewReview('');
-                setShowReviews(true);
+            const result = await response.json();
+            console.log(result)
+            if (response.ok) {
+                if (result.message === "Product deleted due to excessive negative reviews.") {
+                    alert("This product has been removed due to too many negative reviews.");
+                    navigate("/"); // Redirect to home page or product list
+                } 
+                else {
+                    setProduct(result);
+                    setReviews(result.productReviews);
+                    
+                    // Recalculate overall rating
+                    const totalRatings = result.productRatings || [];
+                    const avgRating = totalRatings.length > 0 
+                        ? totalRatings.reduce((a, b) => a + b, 0) / totalRatings.length 
+                        : 0;
+                    setOverallRating(avgRating);
+
+                    setNewReview('');
+                    setNewRating(0);
+                    setShowReviews(true);
+                }
+            } 
+            else {
+                console.log("Failed to add review");
             }
-        } else {
-            console.log("Failed to add review");
+        } 
+        catch (error) {
+            console.error("Add review error:", error);
         }
-    } catch (error) {
-        console.error("Add review error:", error);
-    }
-};
+    };
 
+    const renderStars = (rating) => {
+        return [...Array(5)].map((_, index) => (
+            <FaStar 
+                key={index} 
+                className={`star-icon ${index < Math.round(rating) ? 'filled' : 'empty'}`} 
+            />
+        ));
+    };
 
     return (
         <div className="single-product-page">
@@ -191,6 +223,12 @@ export default function SingleProduct() {
                             </div>
                         )}
                     </div>
+
+                    <div className="product-overall-rating">
+                        <span className="product-info-label">Overall Rating: </span>
+                        {renderStars(overallRating)}
+                        <span className="rating-value">({overallRating.toFixed(1)})</span>
+                    </div>
                     
                     <button className="buy-button" onClick={handleBuy}>
                         <FaShoppingCart style={{ marginRight: '8px' }} /> Add to Cart
@@ -198,6 +236,18 @@ export default function SingleProduct() {
 
                     <div className="review-section">
                         <h3>Share Your Thoughts</h3>
+
+                        <div className="rating-input">
+                            <span className="product-info-label"> Your Rating: </span>
+                            {[...Array(5)].map((_, index) => (
+                                <FaStar 
+                                    key={index} 
+                                    className={`star-icon ${index < newRating ? 'filled' : 'empty'}`}
+                                    onClick={() => setNewRating(index + 1)}
+                                />
+                            ))}
+                        </div>
+                        
                         <textarea
                             value={newReview}
                             onChange={(e) => setNewReview(e.target.value)}
@@ -223,21 +273,24 @@ export default function SingleProduct() {
             
             {/* Reviews section moved outside the single-product-container */}
             {showReviews && (
-    <div className="reviews-container">
-        <div className="reviews-list">
-            <h4>Customer Reviews</h4>
-            {reviews && reviews.length > 0 ? (
-                reviews.map((rev, index) => (
-                    <div key={index} className="review-item">
-                        {rev}
+                <div className="reviews-container">
+                    <div className="reviews-list">
+                        <h4>Customer Reviews</h4>
+                        {reviews && reviews.length > 0 ? (
+                            reviews.map((rev, index) => (
+                                <div key={index} className="review-item">
+                                    {rev}
+                                    <div className="review-rating">
+                                        {renderStars(product.productRatings[index] || 0)}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="no-reviews">No reviews yet. Be the first to review!</p>
+                        )}
                     </div>
-                ))
-            ) : (
-                <p className="no-reviews">No reviews yet. Be the first to review!</p>
+                </div>
             )}
-        </div>
-    </div>
-)}
 
         </div>
     );
