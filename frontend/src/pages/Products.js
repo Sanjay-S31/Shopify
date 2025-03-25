@@ -91,7 +91,7 @@ export default function Products() {
         if (!imageSrc) return;
     
         try {
-            const response = await fetch('/api/products/image_search', {
+            const response = await fetch('http://localhost:5000/image_search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -101,12 +101,15 @@ export default function Products() {
             });
     
             const result = await response.json();
+            console.log("Server Response:", result); // Log the result to the console
+
             if (response.ok) {
                 alert('Image uploaded successfully!');
                 setShowWebcam(false);
             } else {
                 console.error('Failed to upload image:', result.message);
             }
+
         } catch (error) {
             console.error('Error uploading image:', error);
         }
