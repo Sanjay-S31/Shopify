@@ -191,7 +191,7 @@ const getProductsByCategory = async (req, res) => {
 // adding review to a particular product
 const addReviewToProduct = async (req, res) => {
     const { id } = req.params;
-    const { review } = req.body;
+    const { review, rating } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ error: "Invalid product ID" });
@@ -211,6 +211,9 @@ const addReviewToProduct = async (req, res) => {
 
         // Add review to product reviews array
         product.productReviews.push(review);
+
+        // add rating to the product
+        product.productRatings.push(rating);
 
         // Update sentiment count based on response
         if (sentiment === "positive") {
