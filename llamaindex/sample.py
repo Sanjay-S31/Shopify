@@ -2,6 +2,17 @@ import json
 import time
 import os
 import certifi
+import base64
+import numpy as np
+import tensorflow as tf
+
+from tensorflow.keras.applications import EfficientNetV2L
+from tensorflow.keras.applications.efficientnet_v2 import preprocess_input, decode_predictions
+from tensorflow.keras.models import load_model
+
+from PIL import Image
+from io import BytesIO
+
 from pymongo import MongoClient
 from llama_index.readers.mongodb import SimpleMongoReader
 from llama_index.core import VectorStoreIndex, Document, Settings
@@ -12,10 +23,10 @@ from llama_index.embeddings.openai import OpenAIEmbedding  # type: ignore
 from dotenv import load_dotenv
 from bson import ObjectId
 from flask import Flask, jsonify
+
 load_dotenv()
 
-# Set up embedding model
-Settings.embed_model = OpenAIEmbedding(model_name="text-embedding-ada-002")
+MODEL = EfficientNetV2L(weights='imagenet')
 
 # MongoDB Atlas connection
 uri = os.getenv("MONGODB_URL")
@@ -129,3 +140,74 @@ def get_similar_products(product_ids):
         return {"error": str(e)}
 
 
+# IMAGE RECOGNITION
+
+def decode_base64_image(base64_string):
+    """
+    Decode base64 image string to PIL Image
+    """
+    # Remove data URI prefix if present
+    if ',' in base64_string:
+        base64_string = base64_string.split(',')[1]
+    
+    # Decode base64 to image
+    image_bytes = base64.b64decode(base64_string)
+    image = Image.open(BytesIO(image_bytes))
+    
+    return image
+
+def preprocess_image(image):
+    """
+    Preprocess image for EfficientNetV2L model
+    """
+    # Resize image to 480x480 (EfficientNetV2L's input size)
+    image = image.resize((480, 480))
+    
+    # Convert to numpy array and normalize
+    img_array = image.convert('RGB')
+    img_array = np.array(img_array)
+    
+    # Add batch dimension and preprocess
+    img_array = preprocess_input(
+        np.expand_dims(img_array, axis=0)
+    )
+    
+    return img_array
+
+def predict_image_class(preprocessed_image):
+    """
+    Predict the class of the image using EfficientNetV2L
+    """
+    # Make prediction
+    predictions = MODEL.predict(preprocessed_image)
+    
+    # Decode predictions
+    decoded_predictions = decode_predictions(predictions, top=3)[0]
+    
+    # Return top 3 predictions
+    top_predictions = [
+        {
+            'class_name': pred[1],
+            'confidence': float(pred[2])
+        } for pred in decoded_predictions
+    ]
+    
+    return top_predictions
+
+# Example usage in Flask route
+def search_image(base64_image):
+    try:
+        # Decode base64 image
+        image = decode_base64_image(base64_image)
+        
+        # Preprocess image
+        preprocessed_image = preprocess_image(image)
+        
+        # Predict image class
+        results = predict_image_class(preprocessed_image)
+        
+        return {
+            'predictions': results
+        }
+    except Exception as e:
+        return {'error': str(e)}
