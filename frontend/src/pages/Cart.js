@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
-import { FaRupeeSign } from 'react-icons/fa';
+import { FaRupeeSign, FaSpinner } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +10,12 @@ export default function Cart() {
     const { user } = useAuthContext();
     const [cartProduct, setCartProduct] = useState([]);
     const [total, setTotal] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         async function displayAll() {
+            setIsLoading(true);
             try {
                 const response = await fetch("/api/cart", {
                     method: "GET",
@@ -31,11 +33,16 @@ export default function Cart() {
                     }));
                     calculateTotal(updatedData);
                     setCartProduct(updatedData);
-                } else {
+                } 
+                else {
                     console.log("Failed to fetch cart items");
                 }
-            } catch (error) {
+            } 
+            catch (error) {
                 console.error("Fetch cart items error:", error);
+            }
+            finally {
+                setIsLoading(false);
             }
         }
 
@@ -98,6 +105,18 @@ export default function Cart() {
     const handleGoHome = () => {
         navigate('/');
     };
+
+    const LoadingSpinner = () => (
+        <div className="cart-loading-container">
+            <FaSpinner className="cart-loading-spinner" />
+            <p>Loading your cart...</p>
+        </div>
+    );
+
+    // Render loading state
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
 
     return (
         <div className="cart-page">

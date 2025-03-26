@@ -288,6 +288,25 @@
     font-size: 16px;
 }
 
+.single-product-loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.single-product-loading-spinner {
+    animation: spin 1s linear infinite;
+    font-size: 3rem;
+    color: #007bff;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
 /* Responsive design */
 @media (max-width: 992px) {

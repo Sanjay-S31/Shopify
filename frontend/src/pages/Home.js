@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useNavigate } from "react-router-dom";
 import "./style_pages/home.css";
-import { FaChevronLeft, FaChevronRight, FaRobot } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaRobot, FaSpinner } from "react-icons/fa";
 import img1 from "../assets/img1.jpg";
 import img2 from "../assets/img2.jpg";
 import img3 from "../assets/img3.jpg";
@@ -18,6 +18,10 @@ export default function Home() {
     const [likedProducts, setLikedProducts] = useState([]);
     const [recommendedProducts, setRecommendedProducts] = useState([]);
     const [showChatbot, setShowChatbot] = useState(false);
+
+    const [isLoadingLikedProducts, setIsLoadingLikedProducts] = useState(true);
+    const [isLoadingRecommendedProducts, setIsLoadingRecommendedProducts] = useState(true);
+
     // New states for chatbot functionality
     const [messages, setMessages] = useState([
         { text: "How can I assist you with your shopping today?", sender: "bot" }
@@ -41,6 +45,10 @@ export default function Home() {
     // Your existing useEffects for products...
     useEffect(() => {
         const fetchLikedProducts = async () => {
+
+            setIsLoadingLikedProducts(true);
+            setLikedProducts([]);
+
             try {
                 const res = await fetch("/api/user/likedProducts", {
                     method: "GET",
@@ -66,20 +74,34 @@ export default function Home() {
 
                 const likedProductDetails = await Promise.all(productDetailsPromises);
                 setLikedProducts(likedProductDetails);
-            } catch (err) {
+            } 
+            catch (err) {
                 console.error("Error fetching liked products:", err);
+            }
+            finally {
+                setIsLoadingLikedProducts(false);
             }
         };
 
         if (user && user.token) {
             fetchLikedProducts();
         }
+        else {
+            setIsLoadingLikedProducts(false);
+        }
     }, [user]);
 
     useEffect(() => {
         const fetchRecommendedProducts = async () => {
-            if (!user || !user.token) return;
-            console.log("hiiiiiiiii")
+
+            setIsLoadingRecommendedProducts(true);
+            setRecommendedProducts([]);
+
+            if (!user || !user.token) {
+                setIsLoadingRecommendedProducts(false);
+                return;
+            }
+    
             try {
                 const res = await fetch("/api/user/recommendation", {
                     method: "GET",
@@ -88,7 +110,7 @@ export default function Home() {
                         Authorization: `Bearer ${user.token}`,
                     },
                 });
-                console.log(res)
+                
                 if (!res.ok) {
                     throw new Error("Failed to fetch recommended products");
                 }
@@ -96,8 +118,12 @@ export default function Home() {
                 const data = await res.json();
                 setRecommendedProducts(data.recommendedProducts || []);
                 localStorage.setItem("recommendedProducts", JSON.stringify(data.recommendedProducts || []));
-            } catch (err) {
+            } 
+            catch (err) {
                 console.error("Error fetching recommended products:", err);
+            }
+            finally {
+                setIsLoadingRecommendedProducts(false);
             }
         };
 
@@ -204,7 +230,12 @@ export default function Home() {
             {/* Recommended Products */}
             <div className="home-recommended-products">
                 <h2>Recommended Products</h2>
-                {recommendedProducts.length === 0 ? (
+                {isLoadingRecommendedProducts ? (
+                    <div className="products-loading">
+                        <FaSpinner className="loading-spinner" />
+                        <p>Loading recommendations...</p>
+                    </div>
+                ) : recommendedProducts.length === 0 ? (
                     <p>No recommendations available.</p>
                 ) : (
                     <div className="home-product-grid">
@@ -228,7 +259,12 @@ export default function Home() {
             {/* Liked Products */}
             <div className="home-liked-products">
                 <h2>Your Liked Products</h2>
-                {likedProducts.length === 0 ? (
+                {isLoadingLikedProducts ? (
+                    <div className="products-loading">
+                        <FaSpinner className="loading-spinner" />
+                        <p>Loading liked products...</p>
+                    </div>
+                ) : likedProducts.length === 0 ? (
                     <p>No liked products yet.</p>
                 ) : (
                     <div className="home-product-grid">

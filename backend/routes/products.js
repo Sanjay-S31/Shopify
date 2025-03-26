@@ -9,8 +9,6 @@ const {
     updateProduct,
     deleteProduct,
     searchProduct,
-    searchProductImage,
-    getProductsByCategory,
     addReviewToProduct
 } = require('../controllers/productController')
 
@@ -38,12 +36,6 @@ route.put('/:id' , updateProduct)
 
 //search a product
 route.post('/search',searchProduct)
-
-//search a product with image
-route.post('/image_search' , searchProductImage)
-
-// filter a products by category
-route.post('/category', getProductsByCategory);
 
 // adding a review for a product
 route.put('/addReview/:id', addReviewToProduct);

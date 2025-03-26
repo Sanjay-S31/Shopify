@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaRupeeSign, FaHeart, FaShoppingCart, FaStar } from "react-icons/fa";
+import { FaRupeeSign, FaHeart, FaShoppingCart, FaStar, FaSpinner } from "react-icons/fa";
 import './style_components/singleProduct.css';
 
 export default function SingleProduct() {
@@ -17,8 +17,11 @@ export default function SingleProduct() {
     const [reviews, setReviews] = useState([]);
     const [overallRating, setOverallRating] = useState(0);
 
+    const [isLoading, setIsLoading] = useState(true);
+
     const fetchProductInfo = useCallback(async (id) => {
         try {
+            setIsLoading(true);
             const response = await fetch('/api/products/' + id, {
                 method: 'GET',
                 headers: {
@@ -71,6 +74,9 @@ export default function SingleProduct() {
         } catch (error) {
             console.error("Fetch product error:", error);
         }
+        finally {
+            setIsLoading(false);
+        }
     }, [user.token]);
 
     useEffect(() => {
@@ -92,7 +98,7 @@ export default function SingleProduct() {
             const data = await response.json();
 
             if (response.ok && data) {
-                navigate('/products');
+                navigate('/cart');
             } else {
                 console.log("Error occurred during the purchase");
             }
@@ -174,6 +180,19 @@ export default function SingleProduct() {
             />
         ));
     };
+
+    // Loading Spinner Component
+    const LoadingSpinner = () => (
+        <div className="single-product-loading-container">
+            <FaSpinner className="single-product-loading-spinner" />
+            <p>Loading product details...</p>
+        </div>
+    );
+
+    // If loading, return the spinner
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
 
     return (
         <div className="single-product-page">

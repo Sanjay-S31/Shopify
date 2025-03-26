@@ -116,77 +116,58 @@ const updateProduct = async (req,res) => {
 
 //searching product functionality
 const searchProduct = async (req,res) => {
-    try{
-        const { searchInput } = req.body
-        const product = await Product.find({
-            $or: [
-                { productName: { $regex: searchInput, $options: 'i' } }, 
-                { tags: { $regex: searchInput, $options: 'i' } } 
-            ]
-        })
-        res.status(200).json(product)
-    }
-    catch(error){
-        console.log(error)
-    }
-}
-
-// searching the product based on the image given by the user
-
-const searchProductImage = async (req,res) => {
-    const { image } = req.body;
-
-    if (!image) {
-        return res.status(400).json({ error: "Missing image data" });
-    }
-
-    const matches = image.match(/^data:(.+);base64,(.+)$/);
-    if (!matches || matches.length !== 3) {
-        return res.status(400).json({ error: "Invalid image format" });
-    }
-
-    const imageBuffer = Buffer.from(matches[2], 'base64');
-    const mimeType = matches[1];
-    let extension = '.png';  // default extension
-
-    if (mimeType === 'image/jpeg') extension = '.jpg';
-    else if (mimeType === 'image/webp') extension = '.webp';
-
-    const uniqueFilename = 'image-' + Date.now() + '-' + Math.round(Math.random() * 1E9) + extension;
-
-    const dir = path.join(__dirname, '..', 'images');
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-
-    const filePath = path.join(dir, uniqueFilename);
-
-    fs.writeFile(filePath, imageBuffer, (err) => {
-        if (err) {
-            console.error("Error saving image:", err);
-            return res.status(500).json({ error: "Failed to save image" });
-        }
-        res.status(200).json({ message: "Image uploaded successfully", filename: uniqueFilename });
-    });
-}
-
-// filtering the product based on category
-const getProductsByCategory = async (req, res) => {
     try {
-        const { category } = req.body;
-        
-        if (!category) {
-            return res.status(400).json({ error: "Category is required" });
+        const { 
+            searchInput = '', 
+            category = '', 
+            minPrice = 200, 
+            maxPrice = 300000,
+            sortOrder = ''
+        } = req.body
+
+        // Build the query dynamically
+        const query = {
+            cost: { 
+                $gte: Number(minPrice), 
+                $lte: Number(maxPrice) 
+            }
         }
 
-        const products = await Product.find({ productType: category }).sort({ createdAt: -1 });
-        res.status(200).json(products);
-    } 
-    catch (error) {
-        console.error("Error fetching products by category:", error);
-        res.status(500).json({ error: "Internal server error" });
+        // Add category filter if provided
+        if (category) {
+            query.productType = category
+        }
+
+        // Add search input filter if provided
+        if (searchInput) {
+            query.$or = [
+                { productName: { $regex: searchInput, $options: 'i' } }, 
+                { tags: { $regex: searchInput, $options: 'i' } },
+                { productType: { $regex: searchInput, $options: 'i' } }
+            ]
+        }
+
+        // Prepare sorting
+        let sort = { createdAt: -1 }
+        if (sortOrder === 'low-to-high') {
+            sort = { cost: 1 }
+        } else if (sortOrder === 'high-to-low') {
+            sort = { cost: -1 }
+        }
+
+        // Find products matching the query
+        const products = await Product.find(query).sort(sort)
+
+        res.status(200).json({
+            products
+        })
     }
-};
+    catch(error) {
+        console.error('Search and filter error:', error)
+        res.status(500).json({ error: 'Internal server error' })
+    }
+}
+
 
 // adding review to a particular product
 const addReviewToProduct = async (req, res) => {
@@ -244,7 +225,5 @@ module.exports = {
     deleteProduct,
     updateProduct,
     searchProduct,
-    searchProductImage,
-    getProductsByCategory,
     addReviewToProduct
 }

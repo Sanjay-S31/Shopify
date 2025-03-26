@@ -317,3 +317,50 @@
     color: #007b5e;
     font-weight: 500;
 }
+
+/* Loading Styles */
+.products-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    color: #666;
+}
+
+.loading-spinner {
+    animation: spin 1s linear infinite;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #007bff;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.products-loading p {
+    font-size: 1rem;
+    color: #888;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .products-loading {
+        padding: 1rem;
+    }
+
+    .loading-spinner {
+        font-size: 2rem;
+    }
+
+    .products-loading p {
+        font-size: 0.9rem;
+    }
+}

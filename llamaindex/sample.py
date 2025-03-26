@@ -6,8 +6,8 @@ import base64
 import numpy as np
 import tensorflow as tf
 
-from tensorflow.keras.applications import EfficientNetV2L
-from tensorflow.keras.applications.efficientnet_v2 import preprocess_input, decode_predictions
+from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
 from tensorflow.keras.models import load_model
 
 from PIL import Image
@@ -26,7 +26,7 @@ from flask import Flask, jsonify
 
 load_dotenv()
 
-MODEL = EfficientNetV2L(weights='imagenet')
+MODEL = ResNet50(weights='imagenet')
 
 # MongoDB Atlas connection
 uri = os.getenv("MONGODB_URL")
@@ -158,10 +158,10 @@ def decode_base64_image(base64_string):
 
 def preprocess_image(image):
     """
-    Preprocess image for EfficientNetV2L model
+    Preprocess image for ResNet50 model
     """
-    # Resize image to 480x480 (EfficientNetV2L's input size)
-    image = image.resize((480, 480))
+    # Resize image to 224x224 (ResNet50's input size)
+    image = image.resize((224, 224))
     
     # Convert to numpy array and normalize
     img_array = image.convert('RGB')
@@ -176,7 +176,7 @@ def preprocess_image(image):
 
 def predict_image_class(preprocessed_image):
     """
-    Predict the class of the image using EfficientNetV2L
+    Predict the class of the image using ResNet50
     """
     # Make prediction
     predictions = MODEL.predict(preprocessed_image)
@@ -194,8 +194,10 @@ def predict_image_class(preprocessed_image):
     
     return top_predictions
 
-# Example usage in Flask route
 def search_image(base64_image):
+    """
+    Perform image recognition on the provided base64 image
+    """
     try:
         # Decode base64 image
         image = decode_base64_image(base64_image)
@@ -206,8 +208,12 @@ def search_image(base64_image):
         # Predict image class
         results = predict_image_class(preprocessed_image)
         
+        # Extract the top prediction as the primary result
+        top_prediction = results[0] if results else None
+        
         return {
-            'predictions': results
+            'predictions': results,
+            'result': top_prediction['class_name'] if top_prediction else 'Unknown'
         }
     except Exception as e:
         return {'error': str(e)}

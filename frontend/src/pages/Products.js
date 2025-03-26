@@ -1,9 +1,11 @@
-import { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState, useRef, useCallback } from "react"
 import { useAuthContext } from "../hooks/useAuthContext"
 import { useProductsContext } from "../hooks/useProductsContext"
-import { FaSearch, FaCamera } from 'react-icons/fa'
+import { FaSearch, FaCamera, FaFilter, FaSpinner } from 'react-icons/fa'
 import { useNavigate } from "react-router-dom"
 import Webcam from "react-webcam"
+import Slider from 'rc-slider'
+import 'rc-slider/assets/index.css'
 
 import AllProducts from "../components/AllProducts"
 import './style_pages/product.css'
@@ -17,79 +19,71 @@ export default function Products() {
     const [searchInput, setSearchInput] = useState('')
     const [selectedCategory, setSelectedCategory] = useState('')
     const [showWebcam, setShowWebcam] = useState(false)
+    const [showFilterDropdown, setShowFilterDropdown] = useState(false)
+    const [priceRange, setPriceRange] = useState([200, 300000])
+    const [sortOrder, setSortOrder] = useState('')
 
-    const webcamRef = useRef(null);
+    // New state for loading
+    const [isLoading, setIsLoading] = useState(true)
 
-    useEffect(() => {
-        async function fetchProducts() {
-            const response = await fetch('/api/products/all', {
+    const webcamRef = useRef(null)
+
+    const performSearch = useCallback(async () => {
+        if (!user) {
+            setIsLoading(false)
+            return
+        }
+
+        try {
+            setIsLoading(true)
+            const response = await fetch('/api/products/search', {
+                method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${user.token}`
-                }
+                },
+                body: JSON.stringify({
+                    searchInput,
+                    category: selectedCategory,
+                    minPrice: priceRange[0],
+                    maxPrice: priceRange[1],
+                    sortOrder
+                })
             })
 
-            const jsonData = await response.json()
+            const result = await response.json()
             if (response.ok) {
-                dispatch({ type: 'SET_PRODUCTS', payload: jsonData })
+                dispatch({ 
+                    type: 'SET_PRODUCTS', 
+                    payload: result.products 
+                })
+            } 
+            else {
+                console.error("Error in search:", result)
             }
+        } 
+        catch (error) {
+            console.error("Search error:", error)
         }
-
-        if (user) {
-            fetchProducts()
+        finally {
+            setIsLoading(false)
         }
-    }, [dispatch, user])
+    }, [user, searchInput, selectedCategory, priceRange, sortOrder, dispatch])
 
-    const handleSearch = async (event) => {
+    // Trigger search when category changes or on component mount
+    useEffect(() => {
+        performSearch()
+    }, [performSearch])
+
+    const handleSearch = (event) => {
         event.preventDefault()
-
-        const response = await fetch('/api/products/search', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
-            },
-            body: JSON.stringify({ searchInput, category: selectedCategory })
-        })
-
-        const result = await response.json()
-        if (response.ok) {
-            dispatch({ type: 'SET_PRODUCTS', payload: result })
-        }
-
-        if (!response) {
-            console.log("Error occurred in getting the product")
-        }
+        performSearch()
     }
 
-    const handleCategoryChange = async (event) => {
-        const category = event.target.value;
-        setSelectedCategory(category);
-
-        if (category === '') {
-            return;
-        }
-
-        const response = await fetch('/api/products/category', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
-            },
-            body: JSON.stringify({ category })
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            dispatch({ type: 'SET_PRODUCTS', payload: result });
-        } else {
-            console.log("Error occurred while fetching products by category");
-        }
-    };
-
     const captureImage = async () => {
-        const imageSrc = webcamRef.current.getScreenshot();  // get base64 image
-        if (!imageSrc) return;
-    
+        const imageSrc = webcamRef.current.getScreenshot()
+        if (!imageSrc) return
+
         try {
             const response = await fetch('http://localhost:5000/image_search', {
                 method: 'POST',
@@ -98,57 +92,116 @@ export default function Products() {
                     'Authorization': `Bearer ${user.token}`
                 },
                 body: JSON.stringify({ image: imageSrc })
-            });
-    
-            const result = await response.json();
-            console.log("Server Response:", result); // Log the result to the console
+            })
 
+            const result = await response.json()
             if (response.ok) {
-                alert('Image uploaded successfully!');
-                setShowWebcam(false);
+                alert('Image uploaded successfully!')
+                setShowWebcam(false)
+                console.log(result)
             } else {
-                console.error('Failed to upload image:', result.message);
+                console.error('Failed to upload image:', result.message)
             }
-
         } catch (error) {
-            console.error('Error uploading image:', error);
+            console.error('Error uploading image:', error)
         }
-    };
+    }
+
+    const toggleFilterDropdown = () => {
+        setShowFilterDropdown(prev => !prev)
+    }
+
+    const handlePriceRangeChange = (value) => {
+        setPriceRange(value)
+    }
+
+    const handleSortOrderChange = (order) => {
+        setSortOrder(order)
+        setShowFilterDropdown(false)
+    }
 
     const clearSearch = () => {
         setSearchInput('')
         setSelectedCategory('')
-    }
-
-    const toggleWebcam = () => {
-        setShowWebcam(prev => !prev)
+        setPriceRange([200, 300000])
+        setSortOrder('')
+        performSearch()
     }
 
     return (
         <div className="productpage">
             <h1 style={{ textAlign: "center" }}>Our Products</h1>
+            
             <div className="search-bar">
-                <select 
-                    className="category-dropdown"
-                    value={selectedCategory}
-                    onChange={handleCategoryChange}
-                >
-                    <option value="">Categories</option>
-                    <option value="Mobile">Mobiles</option>
-                    <option value="Laptop">Laptop</option>
-                    <option value="Earphones">Earphones</option>
-                </select>
+                <div className="category-filter-container">
+                    <select 
+                        className="category-dropdown"
+                        value={selectedCategory}
+                        onChange={(event) => setSelectedCategory(event.target.value)}
+                    >
+                        <option value="">All Categories</option>
+                        <option value="Mobile">Mobiles</option>
+                        <option value="Laptop">Laptop</option>
+                        <option value="Earphones">Earphones</option>
+                    </select>
+                    
+                    <div className="filter-icon-container">
+                        <FaFilter 
+                            className="filter-icon" 
+                            onClick={toggleFilterDropdown} 
+                        />
+                        {showFilterDropdown && (
+                            <div className="filter-dropdown">
+                                <div className="filter-section">
+                                    <h4>Sort Price</h4>
+                                    <button 
+                                        onClick={() => handleSortOrderChange('low-to-high')}
+                                        className={sortOrder === 'low-to-high' ? 'active' : ''}
+                                    >
+                                        Low to High
+                                    </button>
+                                    <button 
+                                        onClick={() => handleSortOrderChange('high-to-low')}
+                                        className={sortOrder === 'high-to-low' ? 'active' : ''}
+                                    >
+                                        High to Low
+                                    </button>
+                                </div>
+                                <div className="filter-section">
+                                    <h4>Price Range</h4>
+                                    <div className="price-range-slider">
+                                        <Slider
+                                            range
+                                            min={200}
+                                            max={300000}
+                                            value={priceRange}
+                                            onChange={handlePriceRangeChange}
+                                        />
+                                        <div className="price-range-labels">
+                                            <span>₹{priceRange[0]}</span>
+                                            <span>₹{priceRange[1]}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                
                 <input 
                     className="search-bar-input" 
                     type="text"
+                    placeholder="Search products..."
                     value={searchInput}
                     onChange={(event) => setSearchInput(event.target.value)}
                 />
+                
                 <FaSearch className="search-icon" onClick={handleSearch} />
-                <FaCamera className="camera-icon" onClick={toggleWebcam} />
+                <FaCamera className="camera-icon" onClick={() => setShowWebcam(prev => !prev)} />
                 <button className="clear-btn" onClick={clearSearch}>Clear</button>
             </div>
 
+            {/* Webcam Component */}
             {showWebcam && (
                 <div className="webcam-container">
                     <Webcam
@@ -158,21 +211,33 @@ export default function Products() {
                         width={400} 
                         ref={webcamRef}
                         videoConstraints={{ facingMode: "user" }}
-                    />
+                    />  
                     <div className="webcam-buttons">
                         <button onClick={captureImage} className="capture-btn">Capture</button>
-                        <button onClick={toggleWebcam} className="close-webcam-btn">Close</button>
+                        <button onClick={() => setShowWebcam(false)} className="close-webcam-btn">Close</button>
                     </div>
                 </div>
             )}
 
             <div className="productpage-products">
-                {products && products.map((item) => (
-                    <div key={item._id} onClick={() => navigate('/product/' + item._id)}>
-                        <AllProducts key={item._id} product={item} />
+                {isLoading ? (
+                    <div className="products-page-products-loading">
+                        <FaSpinner className="products-page-loading-spinner" />
+                        <p>Loading products...</p>
                     </div>
-                ))}
+                ) : products && products.length > 0 ? (
+                    products.map((item) => (
+                        <div key={item._id} onClick={() => navigate('/product/' + item._id)}>
+                            <AllProducts key={item._id} product={item} />
+                        </div>
+                    ))
+                ) : (
+                    <div className="products-page-no-products">
+                        <p>No products found.</p>
+                    </div>
+                )}
             </div>
+
         </div>
     )
 }
