@@ -32,9 +32,11 @@ export default function Navbar() {
 				<nav>
 					{user && (
 						<div className="nav-links">
+						<Link to="/profile">
 							<span>
 								<FaUser /> {user.username}
 							</span>
+							</Link>
 							{user.userType === "admin" ? (
 								<div className="dropdown" onMouseLeave={closeAdminDropdown}>
 									<button className="dropdown-toggle" onClick={toggleAdminDropdown}>
