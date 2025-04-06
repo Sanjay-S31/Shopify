@@ -98,7 +98,36 @@ export default function Products() {
             if (response.ok) {
                 alert('Image uploaded successfully!')
                 setShowWebcam(false)
-                console.log(result)
+
+                const mainCategory = result.result;
+                const classNames = result.predictions.map(pred => pred.class_name);
+                const searchTerms = [...classNames, mainCategory].join(', ');
+
+                const res = await fetch('/api/products/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
+                    },
+                    body: JSON.stringify({
+                        searchInput : searchTerms,
+                        category: selectedCategory,
+                        minPrice: priceRange[0],
+                        maxPrice: priceRange[1],
+                        sortOrder
+                    })
+                })
+    
+                const searchResult = await res.json()
+                if (res.ok) {
+                    dispatch({ 
+                        type: 'SET_PRODUCTS', 
+                        payload: searchResult.products 
+                    })
+                } 
+                else {
+                    console.error("Error in search:", searchResult)
+                }
             } else {
                 console.error('Failed to upload image:', result.message)
             }

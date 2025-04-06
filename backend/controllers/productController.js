@@ -140,11 +140,17 @@ const searchProduct = async (req,res) => {
 
         // Add search input filter if provided
         if (searchInput) {
-            query.$or = [
-                { productName: { $regex: searchInput, $options: 'i' } }, 
-                { tags: { $regex: searchInput, $options: 'i' } },
-                { productType: { $regex: searchInput, $options: 'i' } }
-            ]
+            const searchTerms = searchInput
+                .split(',')
+                .map(term => term.trim())
+                .filter(term => term.length > 0)
+
+            // Build $or query for each term across multiple fields
+            query.$or = searchTerms.flatMap(term => ([
+                { productName: { $regex: term, $options: 'i' } },
+                { tags: { $regex: term, $options: 'i' } },
+                { productType: { $regex: term, $options: 'i' } }
+            ]))
         }
 
         // Prepare sorting

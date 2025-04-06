@@ -92,11 +92,7 @@ def image_search():
         if 'predictions' in result:
             for i, pred in enumerate(result['predictions'], 1):
                 print(f"Prediction {i}: {pred['class_name']} (Confidence: {pred['confidence']})")
-            
-            # If a smartphone is detected
-            if any('smartphone' in pred['class_name'].lower() for pred in result['predictions']):
-                # You could add more specific logic here for smartphone detection
-                result['description'] = "A smartphone has been detected in the image."
+    
         elif 'error' in result:
             print(f"Error: {result['error']}")
 
