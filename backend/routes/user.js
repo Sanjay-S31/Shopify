@@ -12,13 +12,17 @@ const {
   getUserProfile,
   editUserProfile,
   changePassword,
+  forgotPassword,
   getRecommendedProducts,
 } = require("../controllers/userController");
 
-//login
+// login
 route.post("/login", loginUser);
 
-//signup
+// forgot password
+route.post("/forgotPassword", forgotPassword)
+
+// signup
 route.post("/signup", signupUser);
 
 route.use(requireAuth);
