@@ -1,9 +1,10 @@
-const User = require('../models/userModel')
+const User = require('../models/UserModel')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const Recommendation = require('../models/RecommendationModel')
 const Product = require('../models/productModel');
+const sendMail = require('../utils/mailer');
 
 const axios = require("axios"); // Import axios for making HTTP requests
 
@@ -210,6 +211,59 @@ const getRecommendedProducts = async (req, res) => {
     }
 };
 
+// Controller function for forgot password
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    // Validate email
+    if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+    }
+
+    try {
+        // Check if user exists with the provided email
+        const user = await User.findOne({ email });
+        
+        if (!user) {
+            return res.status(404).json({ error: "No account exists with this email" });
+        }
+
+        // Generate a new secure password
+        const { generateSecurePassword } = require('../utils/passwordGenerator');
+        const newPassword = generateSecurePassword();
+
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(newPassword, salt);
+        
+        // Update user's password in the database
+        user.password = hash;
+        await user.save();
+
+        // Prepare email content
+        const emailSubject = "Your Password Reset Request";
+        const emailContent = `
+            <h2>Password Reset</h2>
+            <p>Hello ${user.username},</p>
+            <p>Your password has been reset as requested. Here is your new password:</p>
+            <p><strong>${newPassword}</strong></p>
+            <p>Please login with this new password and change it immediately for security reasons.</p>
+            <p>If you did not request this password reset, please contact support immediately.</p>
+            <p>Best regards,<br>The Shopify Team</p>
+        `;
+
+        // Send email with the new password
+        await sendMail(email, emailSubject, emailContent);
+
+        return res.status(200).json({ 
+            message: "Password reset successful. A new password has been sent to your email." 
+        });
+        
+    } catch (err) {
+        console.error("Error in forgot password:", err);
+        return res.status(500).json({ error: "Failed to process password reset" });
+    }
+};
 
 module.exports = {
     loginUser,
@@ -220,5 +274,6 @@ module.exports = {
     getUserProfile,
     editUserProfile,
     changePassword,
+    forgotPassword,
     getRecommendedProducts,
 };
