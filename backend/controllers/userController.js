@@ -1,10 +1,10 @@
-const User = require('../models/UserModel')
+const User = require('../models/userModel')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const validator = require('validator');
-const Recommendation = require('../models/RecommendationModel')
+const Recommendation = require('../models/recommendationModel')
 const Product = require('../models/productModel');
-const sendMail = require('../utils/mailer');
+const sendMail = require('../utils/mailer')
 
 const axios = require("axios"); // Import axios for making HTTP requests
 

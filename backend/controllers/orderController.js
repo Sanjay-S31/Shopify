@@ -1,5 +1,8 @@
 const Order = require('../models/orderModel');
+const User = require('../models/userModel');
 const Product = require('../models/productModel'); // Assuming you have a Product model
+const sendMail = require('../utils/mailer');
+
 const mongoose = require('mongoose');
 
 // Create a new order
@@ -41,6 +44,20 @@ const createOrder = async (req, res) => {
             }
         }
 
+        const user = await User.findById(req.user._id);
+        
+        if (user && user.email) {
+
+            // Create email subject
+            const emailSubject = `Order Confirmation - Order #${order._id}`;
+            
+            // Create receipt HTML
+            const receiptHTML = generateOrderReceiptHTML(order, shippingInfo);
+            
+            // Send the email
+            sendMail(user.email, emailSubject, receiptHTML);
+        }
+
         res.status(201).json({ 
             success: true, 
             order: order,
@@ -50,6 +67,90 @@ const createOrder = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+function generateOrderReceiptHTML(order, shippingInfo) {
+    // Create items list HTML
+    const itemsHTML = order.items.map(item => `
+        <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.productName}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₹${item.cost.toFixed(2)}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">₹${(item.cost * item.quantity).toFixed(2)}</td>
+        </tr>
+    `).join('');
+
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; padding: 20px 0; border-bottom: 2px solid #eee; }
+            .order-details { margin: 20px 0; }
+            .order-table { width: 100%; border-collapse: collapse; }
+            .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #777; }
+            .summary { margin-top: 20px; text-align: right; }
+            .address-section { margin: 20px 0; }
+            .payment-section { margin: 20px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Thank you for your order!</h1>
+                <p>Order #${order._id}</p>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+            </div>
+            
+            <div class="order-details">
+                <h2>Order Details</h2>
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding: 10px; border-bottom: 2px solid #eee;">Product</th>
+                            <th style="text-align: center; padding: 10px; border-bottom: 2px solid #eee;">Quantity</th>
+                            <th style="text-align: right; padding: 10px; border-bottom: 2px solid #eee;">Price</th>
+                            <th style="text-align: right; padding: 10px; border-bottom: 2px solid #eee;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHTML}
+                    </tbody>
+                </table>
+                
+                <div class="summary">
+                    <p><strong>Total Amount: ₹${order.totalAmount.toFixed(2)}</strong></p>
+                </div>
+            </div>
+            
+            <div class="address-section">
+                <h2>Shipping Information</h2>
+                <p>
+                    ${shippingInfo.name}<br>
+                    ${shippingInfo.address}, ${shippingInfo.city}<br>
+                    ${shippingInfo.state}, ${shippingInfo.zipCode}<br>
+                    ${shippingInfo.country}<br>
+                    Phone: ${shippingInfo.phone}
+                </p>
+            </div>
+            
+            <div class="payment-section">
+                <h2>Payment Information</h2>
+                <p><strong>Payment Method:</strong> ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}</p>
+                <p><strong>Payment Status:</strong> ${order.paymentStatus}</p>
+            </div>
+            
+            <div class="footer">
+                <p>If you have any questions about your order, please contact our customer support.</p>
+                <p>© ${new Date().getFullYear()} Your Store Name. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    `;
+}
+
 
 // Get all orders for a user
 const getUserOrders = async (req, res) => {
