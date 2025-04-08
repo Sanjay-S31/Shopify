@@ -13,6 +13,7 @@ import Cart from './pages/Cart';
 import Payment from './pages/Payment';
 import Order from './pages/Order';
 import AdminOrders from "./pages/AdminOrders";
+import ForgotPassword from './pages/ForgotPassword';
 
 function App() {
 
@@ -35,6 +36,10 @@ function App() {
           <Route
             path='/signup'
             element={!user ? <SignUp /> : <Navigate to="/" />}
+          />
+          <Route
+            path='/forgot-password'
+            element={!user ? <ForgotPassword /> : <Navigate to="/" />}
           />
           <Route
             path="/profile"
