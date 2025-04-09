@@ -22,6 +22,10 @@ export default function Home() {
     const [isLoadingLikedProducts, setIsLoadingLikedProducts] = useState(true);
     const [isLoadingRecommendedProducts, setIsLoadingRecommendedProducts] = useState(true);
 
+    const [topRatedProducts, setTopRatedProducts] = useState([]);
+    const [isLoadingTopRatedProducts, setIsLoadingTopRatedProducts] = useState(true);
+
+
     // New states for chatbot functionality
     const [messages, setMessages] = useState([
         { text: "How can I assist you with your shopping today?", sender: "bot" }
@@ -128,6 +132,39 @@ export default function Home() {
         };
 
         fetchRecommendedProducts();
+    }, [user]);
+
+    useEffect(() => {
+        const fetchTopRatedProducts = async () => {
+            setIsLoadingTopRatedProducts(true)
+            setTopRatedProducts([]);
+    
+            try {
+                const res = await fetch("/api/products/topProducts", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                });
+                
+                if (!res.ok) {
+                    throw new Error("Failed to fetch top rated products");
+                }
+    
+                const data = await res.json();
+                setTopRatedProducts(data.products || []);
+
+            } 
+            catch (err) {
+                console.error("Error fetching top-rated products:", err);
+            }
+            finally {
+                setIsLoadingTopRatedProducts(false);
+            }
+        };
+    
+        fetchTopRatedProducts();
     }, [user]);
 
     const prevSlide = () => {
@@ -269,6 +306,34 @@ export default function Home() {
                 ) : (
                     <div className="home-product-grid">
                         {likedProducts.map((product) => (
+                            <div
+                                key={product._id}
+                                className="home-product-card"
+                                onClick={() => handleProductClick(product._id)}
+                            >
+                                <img src={product.productImage} alt={product.productName} />
+                                <div className="home-product-info">
+                                    <p className="home-product-name">{product.productName}</p>
+                                    <p className="home-product-cost">₹{product.cost}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="home-top-rated-products">
+                <h2>Top Rated Products</h2>
+                {isLoadingTopRatedProducts ? (
+                    <div className="products-loading">
+                        <FaSpinner className="loading-spinner" />
+                        <p>Loading top rated products...</p>
+                    </div>
+                ) : topRatedProducts.length === 0 ? (
+                    <p>No top rated products available.</p>
+                ) : (
+                    <div className="home-product-grid">
+                        {topRatedProducts.map((product) => (
                             <div
                                 key={product._id}
                                 className="home-product-card"

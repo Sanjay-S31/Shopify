@@ -223,6 +223,44 @@ const addReviewToProduct = async (req, res) => {
     }
 };
 
+const topRatedProducts = async (req,res) => {
+
+    try {
+        const products = await Product.find()
+
+        if (!products || products.length === 0) {
+            return res.status(404).json({ message: "No products found." });
+        }
+
+        // Calculate average rating for each product
+        const productsWithRatings = products
+            .filter(product => (product.productRatings || []).length > 0)
+            .map(product => {
+                const ratings = product.productRatings;
+                const sum = ratings.reduce((total, rating) => total + rating, 0);
+                const averageRating = sum / ratings.length;
+                
+                // Convert to plain object to add the averageRating property
+                const productObj = product.toObject();
+                productObj.averageRating = averageRating;
+                
+                return productObj;
+        });
+
+        // Sort products by average rating (highest first)
+        productsWithRatings.sort((a, b) => b.averageRating - a.averageRating);
+
+        // Get top 5 products
+        const topProducts = productsWithRatings.slice(0, 5);
+
+        res.status(200).json({ products: topProducts });
+    }
+    catch (error) {
+        console.error("Error fetching top-rated products:", error);
+        res.status(500).json({ error: "Failed to fetch top rated products" });
+    }
+}
+
 module.exports = {
     getProducts,
     getAllProducts,
@@ -231,5 +269,6 @@ module.exports = {
     deleteProduct,
     updateProduct,
     searchProduct,
-    addReviewToProduct
+    addReviewToProduct,
+    topRatedProducts
 }

@@ -272,6 +272,24 @@
     font-size: 18px;
 }
 
+/* Liked Products Section */
+.home-top-rated-products {
+    width: 90%;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.home-top-rated-products h2 {
+    font-size: 28px;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+.home-top-rated-products p {
+    color: #666;
+    font-size: 18px;
+}
+
 /* Grid Layout for Product Cards */
 .home-product-grid {
     display: grid;

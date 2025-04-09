@@ -9,7 +9,8 @@ const {
     updateProduct,
     deleteProduct,
     searchProduct,
-    addReviewToProduct
+    addReviewToProduct,
+    topRatedProducts
 } = require('../controllers/productController')
 
 const requireAuth = require('../middleware/requireAuth')
@@ -21,6 +22,9 @@ route.get('/' , getProducts)
 
 //get all the product
 route.get('/all' , getAllProducts)
+
+// getting the top rated products
+route.get('/topProducts' , topRatedProducts)
 
 //get product with id
 route.get('/:id' , getProductWithId)
