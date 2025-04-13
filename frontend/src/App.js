@@ -14,6 +14,7 @@ import Payment from './pages/Payment';
 import Order from './pages/Order';
 import AdminOrders from "./pages/AdminOrders";
 import ForgotPassword from './pages/ForgotPassword';
+import GoogleRedirect from './pages/GoogleRedirect';
 
 function App() {
 
@@ -73,6 +74,8 @@ function App() {
               path="/admin-orders" 
               element={user ? <AdminOrders /> : <Navigate to="/" />} 
           />
+          <Route path='/google-redirect' element={<GoogleRedirect />} />
+
         </Routes>
       </div>
 

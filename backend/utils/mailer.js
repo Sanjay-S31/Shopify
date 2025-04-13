@@ -9,6 +9,8 @@ function sendMail(to, subject, text) {
             pass: process.env.EMAIL_PASS,
         }
     });
+    console.log("User:", process.env.EMAIL_USER);
+console.log("Pass:", process.env.EMAIL_PASS ? '********' : 'MISSING');
 
     const mailOptions = {
         from: process.env.EMAIL_USER,

@@ -1,17 +1,32 @@
 import { useState } from "react";
 import { useLogin } from '../hooks/useLogin';
-import { Link } from "react-router-dom"
-
-import './style_pages/login.css' 
-
+import { Link } from "react-router-dom";
+import './style_pages/login.css';
+import { useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login, error, isLoading } = useLogin();
+    const { login,googleLogin,error, isLoading } = useLogin();
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const error = params.get("error");
+
+        if (error) {
+            alert(decodeURIComponent(error));  // ✅ Show browser alert box
+        }
+    }, [location]);
 
     const handleSubmit = async (event) => {
+        console.log(event)
         event.preventDefault();
         await login(email, password);
+    };
+
+    const handleGoogleLogin = () => {
+        googleLogin(); // ✅ this now works
     };
 
     return (
@@ -21,7 +36,7 @@ export default function Login() {
                     <div className="login-header">
                         <p>Welcome back! Please login to continue</p>
                     </div>
-                    
+
                     <form onSubmit={handleSubmit} className="login-form">
                         <div className="input-group">
                             <label htmlFor="email">Email</label>
@@ -34,7 +49,7 @@ export default function Login() {
                                 placeholder="your@email.com"
                             />
                         </div>
-                        
+
                         <div className="input-group">
                             <label htmlFor="password">Password</label>
                             <input
@@ -46,34 +61,27 @@ export default function Login() {
                                 placeholder="••••••••"
                             />
                         </div>
-                        
+
                         <div className="forgot-password">
-                            <Link to="/forgot-password">Forgot Password ?</Link>
+                            <Link to="/forgot-password">Forgot Password?</Link>
                         </div>
-                        
+
                         <button 
                             type="submit" 
                             className="login-button" 
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Logging in...' : 'Log In'}
+                            {isLoading ? 'Logging in...' : 'Log in'}
                         </button>
-                        
+
                         {error && <div className="error-message">{error}</div>}
-                        
+
                         <div className="divider">
                             <span>or continue with</span>
                         </div>
-                        
+
                         <div className="social-login">
-                            <button type="button" className="social-button facebook">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
-                                    <path fill="#1877F2" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"></path>
-                                    <path fill="#fff" d="M26.707,29.301h5.176l0.813-5.258h-5.989v-2.874c0-2.184,0.714-4.121,2.757-4.121h3.283V12.46 c-0.577-0.078-1.797-0.248-4.102-0.248c-4.814,0-7.636,2.542-7.636,8.334v3.498H16.06v5.258h4.948v14.452 C21.988,43.9,22.981,44,24,44c0.921,0,1.82-0.084,2.707-0.204V29.301z"></path>
-                                </svg>
-                                <span>Facebook</span>
-                            </button>
-                            <button type="button" className="social-button google">
+                            <button type="button" className="social-button google" onClick={handleGoogleLogin}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
                                     <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
                                     <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path>
@@ -84,12 +92,12 @@ export default function Login() {
                             </button>
                         </div>
                     </form>
-                    
+
                     <div className="signup-link">
                         <p>Don't have an account? <Link to="/signup">Signup</Link></p>
                     </div>
                 </div>
-                
+
                 <div className="login-image">
                     <div className="login-overlay">
                         <div className="welcome-text">

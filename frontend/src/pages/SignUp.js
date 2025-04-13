@@ -85,11 +85,11 @@ export default function SignUp() {
                         
                         {error && <div className="error-message">{error}</div>}
                         
-                        <div className="divider">
+                        {/* <div className="divider">
                             <span>or sign up with</span>
-                        </div>
+                        </div> */}
                         
-                        <div className="social-login">
+                        {/* <div className="social-login">
                             <button type="button" className="social-button facebook">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
                                     <path fill="#1877F2" d="M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z"></path>
@@ -106,7 +106,7 @@ export default function SignUp() {
                                 </svg>
                                 <span>Google</span>
                             </button>
-                        </div>
+                        </div> */}
                     </form>
                     
                     <div className="login-link">

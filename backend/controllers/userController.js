@@ -13,22 +13,43 @@ const createToken = (_id) => {
 }
 
 //login user function
+// In controllers/userController.js
+
 const loginUser = async (req, res) => {
+    const { email, password } = req.body;
 
-    const { email, password } = req.body
     try {
-        const user = await User.login(email, password)
+        // Find the user by email
+        const user = await User.findOne({ email });
 
-        const username = user.username
-        const userType = user.userType
-        // token creation
-        const token = createToken(user._id)
-        res.status(200).json({ username, userType, token })
+        if (!user) {
+            return res.status(400).json({ error: 'User does not exist' });
+        }
+
+        // Verify password (you can add more logic here like bcrypt)
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: 'Invalid password' });
+        }
+
+        // Send back full user data, including email, username, and token
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
+        res.status(200).json({
+            email: user.email,
+            username: user.username,  // Ensure this is included
+            userType: user.userType,  // If you have userType, include this
+            token
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
     }
-    catch (err) {
-        res.status(400).json({ error: err.message })
-    }
-}
+};
+
 
 
 //signup function
