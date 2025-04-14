@@ -63,13 +63,14 @@ export default function AdminOrders() {
         [orderId]: true
       });
 
+
       const response = await fetch(`/api/orders/admin/status/${orderId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user.token}`,
         },
-        body: JSON.stringify({ status: selectedStatus[orderId] }),
+        body: JSON.stringify({ orderStatus: selectedStatus[orderId] }),
       });
 
       const json = await response.json();

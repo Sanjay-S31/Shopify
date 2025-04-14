@@ -20,7 +20,7 @@ export default function Products() {
     const [selectedCategory, setSelectedCategory] = useState('')
     const [showWebcam, setShowWebcam] = useState(false)
     const [showFilterDropdown, setShowFilterDropdown] = useState(false)
-    const [priceRange, setPriceRange] = useState([200, 300000])
+    const [priceRange, setPriceRange] = useState([0, 300000])
     const [sortOrder, setSortOrder] = useState('')
 
     // New state for loading

@@ -12,14 +12,6 @@ const getProducts = async (req,res) => {
 
 }
 
-
-const getAllProducts = async (req,res) => {
-
-    const products = await Product.find().sort({createdAt:-1})
-    res.status(200).json(products)
-
-}
-
 const getProductWithId = async (req,res) => {
 
     const { id } = req.params
@@ -263,7 +255,6 @@ const topRatedProducts = async (req,res) => {
 
 module.exports = {
     getProducts,
-    getAllProducts,
     getProductWithId,
     createProduct,
     deleteProduct,

@@ -99,7 +99,7 @@ def get_similar_products(product_ids):
         if not tags:
             return {"error": "No tags found for the provided products."}
 
-        query_text = f"Return a JSON array of product_ids where the tags match: {', '.join(tags)}. Only include the product_ids in the response."
+        query_text = f"Return a JSON array of product_ids where the tags match any of these: {', '.join(tags)}. Only include the product_ids in the response."
 
         product_fields = ["_id", "productName", "productType", "description", "cost", "tags"]
         products_docs = reader.load_data("EcommerceDB", "products", field_names=product_fields)
@@ -123,7 +123,7 @@ def get_similar_products(product_ids):
         except json.JSONDecodeError:
             recommended_products = []
 
-        return {"recommended_products": recommended_products}
+        return {"recommended_products": recommended_products,"elsecase":product_ids}
 
     except Exception as e:
         print(f"[ERROR] An error occurred: {e}")

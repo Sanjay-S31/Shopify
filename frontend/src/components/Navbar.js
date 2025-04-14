@@ -55,9 +55,13 @@ export default function Navbar() {
 
 							<Link to="/">Home</Link>
 							<Link to="/products">Products</Link>
-							<Link to="/cart">
-								<FaShoppingCart className="cart-icon" />
-							</Link>
+							
+							{user.userType !== "admin" && (
+								<Link to="/cart">
+									<FaShoppingCart className="cart-icon" />
+								</Link>
+							)}
+
 							<button className="logout-btn" onClick={handleLogout}>Logout</button>
 						</div>
 					)}

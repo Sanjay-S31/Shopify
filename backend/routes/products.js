@@ -3,7 +3,6 @@ const route = express.Router()
 
 const {
     getProducts,
-    getAllProducts,
     getProductWithId,
     createProduct,
     updateProduct,
@@ -19,9 +18,6 @@ route.use(requireAuth)
 
 //get product details for particular user
 route.get('/' , getProducts)
-
-//get all the product
-route.get('/all' , getAllProducts)
 
 // getting the top rated products
 route.get('/topProducts' , topRatedProducts)

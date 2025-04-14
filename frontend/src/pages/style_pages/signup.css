@@ -46,7 +46,7 @@
 }
 
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     position: relative;
 }
 
@@ -123,70 +123,6 @@
     background-color: rgba(229, 57, 53, 0.1);
     border-radius: 8px;
     text-align: center;
-}
-
-.divider {
-    position: relative;
-    text-align: center;
-    margin: 25px 0;
-}
-
-.divider::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: #dce1ed;
-}
-
-.divider span {
-    position: relative;
-    display: inline-block;
-    padding: 0 16px;
-    background-color: #fff;
-    color: #8896ab;
-    font-size: 14px;
-}
-
-.social-login {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 25px;
-}
-
-.social-button {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #dce1ed;
-    background-color: #fff;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.social-button:hover {
-    background-color: #f5f7fa;
-}
-
-.social-button:active {
-    transform: scale(0.98);
-}
-
-.facebook:hover {
-    border-color: #1877F2;
-}
-
-.google:hover {
-    border-color: #4285F4;
 }
 
 .login-link {

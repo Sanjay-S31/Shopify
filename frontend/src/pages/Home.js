@@ -120,8 +120,20 @@ export default function Home() {
                 }
 
                 const data = await res.json();
-                setRecommendedProducts(data.recommendedProducts || []);
-                localStorage.setItem("recommendedProducts", JSON.stringify(data.recommendedProducts || []));
+                if (Array.isArray(data.recommendedProducts)) {
+                    setRecommendedProducts(data.recommendedProducts);
+                    localStorage.setItem("recommendedProducts", JSON.stringify(data.recommendedProducts));
+                } 
+                else if (data.product_ids && Array.isArray(data.product_ids)) {
+                    // If user object is returned with product_ids instead
+                    setRecommendedProducts(data.product_ids);
+                    localStorage.setItem("recommendedProducts", JSON.stringify(data.product_ids));
+                } 
+                else {
+                    // If neither exists, set empty array
+                    setRecommendedProducts([]);
+                    localStorage.setItem("recommendedProducts", JSON.stringify([]));
+                }
             } 
             catch (err) {
                 console.error("Error fetching recommended products:", err);

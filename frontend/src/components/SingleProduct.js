@@ -249,9 +249,11 @@ export default function SingleProduct() {
                         <span className="rating-value">({overallRating.toFixed(1)})</span>
                     </div>
                     
-                    <button className="buy-button" onClick={handleBuy}>
-                        <FaShoppingCart style={{ marginRight: '8px' }} /> Add to Cart
-                    </button>
+                    {user && user.userType !== "admin" && (
+                        <button className="buy-button" onClick={handleBuy}>
+                            <FaShoppingCart style={{ marginRight: '8px' }} /> Add to Cart
+                        </button>
+                    )}
 
                     <div className="review-section">
                         <h3>Share Your Thoughts</h3>

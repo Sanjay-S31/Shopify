@@ -180,7 +180,7 @@ const getOrderById = async (req, res) => {
         }
 
         // Check if the order belongs to the requesting user (unless admin)
-        if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+        if (order.user.toString() !== req.user._id.toString() && req.user.userType !== 'admin') {
             return res.status(403).json({ error: 'Not authorized to view this order' });
         }
 
@@ -243,7 +243,7 @@ const updateOrderStatus = async (req, res) => {
     
     try {
         // Check if user is admin
-        if (req.user.role !== 'admin') {
+        if (req.user.userType !== 'admin') {
             return res.status(403).json({ error: 'Not authorized to update order status' });
         }
 

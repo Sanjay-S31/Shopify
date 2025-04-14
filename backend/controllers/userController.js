@@ -95,7 +95,12 @@ const addProductId = async (req, res) => {
                 userId, 
                 productIds: user.product_ids 
             });
-            const recommendedProducts = response.data.recommended_products || [];
+            
+            let recommendedProducts = response.data.recommended_products
+            if(response.data.recommended_products.length==0){
+                recommendedProducts=response.data.elsecase;
+            }
+            
             await Recommendation.findOneAndUpdate(
                 { userId },
                 { $set: { recommendedProductIds: recommendedProducts } }, // Replace old recommendations with new ones
