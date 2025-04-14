@@ -29,6 +29,7 @@
 
 .profile-field span {
     flex: 1;
+    margin-left: 18px;
 }
 
 .profile-form .form-row {
@@ -69,6 +70,10 @@
 .gender-options label {
     font-weight: normal;
     font-size: 15px;
+}
+
+.gender-options label span{
+    margin-left: 4px;
 }
 
 .edit-icon {

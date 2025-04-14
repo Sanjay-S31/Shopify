@@ -104,10 +104,17 @@
     background-color: #d32f2f;
 }
 
-.camera-icon {
-    font-size: 1.5rem;
+.search-icon {
+    font-size: 1.7rem;
     cursor: pointer;
     margin-left: 10px;
+    color: #333;
+}
+
+.camera-icon {
+    font-size: 2rem;
+    cursor: pointer;
+    margin-left: 15px;
     color: #333;
 }
 
@@ -228,7 +235,7 @@
     color: #3a3a3a;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 1.2rem;
+    font-size: 1.7rem;
 }
 
 .filter-icon:hover {

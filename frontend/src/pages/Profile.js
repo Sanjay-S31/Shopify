@@ -149,7 +149,7 @@ export default function Profile() {
                                 checked={gender === "Male"}
                                 onChange={(e) => setGender(e.target.value)}
                             />
-                            Male
+                            <span>Male</span>
                         </label>
                         <label>
                             <input
@@ -158,7 +158,7 @@ export default function Profile() {
                                 checked={gender === "Female"}
                                 onChange={(e) => setGender(e.target.value)}
                             />
-                            Female
+                            <span>Female</span>
                         </label>
                     </div>
                 </div>
